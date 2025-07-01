@@ -24,19 +24,19 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      {/* <Sidebar /> */}
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+            Monitor your invoice processing performance
+          </p>
+        </div>
+      </div>
+
+      <MetricsCards metrics={metrics} />
       
-      <div className="flex-1">
-        <Header 
-          title="Dashboard"
-          subtitle="Monitor your FIRS MBS invoice integrations"
-        />
-        
-        <main className="p-6 space-y-6">
-          <MetricsCards metrics={metrics} />
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Quick Actions */}
             <div className="lg:col-span-1">
               <Card>
@@ -87,13 +87,11 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Invoice Submission Form */}
-          <InvoiceForm />
+      {/* Invoice Submission Form */}
+      <InvoiceForm />
 
-          {/* System Status and API Usage */}
-          <SystemStatus status={systemStatus} />
-        </main>
-      </div>
+      {/* System Status and API Usage */}
+      <SystemStatus status={systemStatus} />
     </div>
   );
 }

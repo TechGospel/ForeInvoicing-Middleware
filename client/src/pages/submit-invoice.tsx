@@ -4,19 +4,17 @@ import { InvoiceForm } from "@/components/invoice/invoice-form";
 
 export default function SubmitInvoice() {
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      {/* <Sidebar /> */}
-
-      <div className="flex-1">
-        <Header
-          title="Submit Invoice"
-          subtitle="Upload and validate B2B invoices for FIRS MBS integration"
-        />
-
-        <main className="p-6">
-          <InvoiceForm />
-        </main>
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold">Submit Invoice</h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+            Upload and process invoices through FIRS MBS
+          </p>
+        </div>
       </div>
+      
+      <InvoiceForm />
     </div>
   );
 }
