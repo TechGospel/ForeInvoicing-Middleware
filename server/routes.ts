@@ -57,6 +57,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Auth register endpoint
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { username, email, password, companyName, tin } = req.body;
+      
+      // Check if username already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+
+      // Create tenant first
+      const apiKey = AuthService.generateApiKey();
+      const tenant = await storage.createTenant({
+        name: companyName,
+        tin,
+        email,
+        apiKey,
+        isActive: true,
+        config: {
+          validationRules: ['strict_tin'],
+          autoCorrect: false
+        }
+      });
+
+      // Create user
+      const hashedPassword = await AuthService.hashPassword(password);
+      const user = await storage.createUser({
+        username,
+        email,
+        password: hashedPassword,
+        tenantId: tenant.id,
+        role: 'admin',
+        isActive: true
+      });
+
+      res.status(201).json({
+        message: "Account created successfully",
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          tenantId: user.tenantId,
+          role: user.role
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Registration failed" });
+    }
+  });
+
   // Dashboard metrics (temporarily bypassing auth for demo)
   app.get("/api/dashboard/metrics", async (req: AuthRequest, res) => {
     try {
@@ -325,6 +376,154 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(logs);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch audit logs" });
+    }
+  });
+
+  // Tenant management endpoints
+  app.get("/api/tenants", async (req, res) => {
+    try {
+      // For demo, return all tenants
+      const tenants = await db.select().from(require('../shared/schema').tenants);
+      res.json(tenants);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch tenants" });
+    }
+  });
+
+  app.put("/api/tenants/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      
+      await db.update(require('../shared/schema').tenants)
+        .set({ ...updates, updatedAt: new Date() })
+        .where(require('drizzle-orm').eq(require('../shared/schema').tenants.id, parseInt(id)));
+      
+      res.json({ message: "Tenant updated successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update tenant" });
+    }
+  });
+
+  app.post("/api/tenants/:id/regenerate-key", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const newApiKey = AuthService.generateApiKey();
+      
+      await db.update(require('../shared/schema').tenants)
+        .set({ apiKey: newApiKey, updatedAt: new Date() })
+        .where(require('drizzle-orm').eq(require('../shared/schema').tenants.id, parseInt(id)));
+      
+      res.json({ message: "API key regenerated successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to regenerate API key" });
+    }
+  });
+
+  app.get("/api/tenants/:id/users", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const users = await db.select()
+        .from(require('../shared/schema').users)
+        .where(require('drizzle-orm').eq(require('../shared/schema').users.tenantId, parseInt(id)));
+      
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  app.post("/api/users", async (req, res) => {
+    try {
+      const userData = req.body;
+      const hashedPassword = await AuthService.hashPassword(userData.password);
+      
+      const [user] = await db.insert(require('../shared/schema').users)
+        .values({
+          ...userData,
+          password: hashedPassword
+        })
+        .returning();
+      
+      res.status(201).json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create user" });
+    }
+  });
+
+  // Configuration endpoints
+  app.get("/api/configuration", async (req, res) => {
+    try {
+      // Return mock configuration for demo
+      const config = {
+        validationRules: ['strict_tin', 'vat_required'],
+        autoCorrect: true,
+        strictValidation: true,
+        asyncProcessing: false,
+        retryAttempts: 3,
+        timeoutSeconds: 30,
+        firsApiUrl: "https://api.firs.gov.ng/mbs/v1",
+        firsApiKey: "demo-firs-key",
+        webhookUrl: "",
+        maxFileSize: 10,
+        allowedFormats: ["xml", "json"]
+      };
+      res.json(config);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch configuration" });
+    }
+  });
+
+  app.put("/api/configuration", async (req, res) => {
+    try {
+      // In a real implementation, save to database
+      const config = req.body;
+      
+      // Audit log the configuration change
+      await auditLogger.logUserAction(
+        1, // Demo tenant
+        1, // Demo user
+        'configuration_update',
+        'System configuration updated',
+        config
+      );
+      
+      res.json({ message: "Configuration updated successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update configuration" });
+    }
+  });
+
+  app.post("/api/configuration/test-firs", async (req, res) => {
+    try {
+      // Test FIRS connection
+      const testResult = await firsAdapter.getInvoiceStatus("TEST-IRN");
+      res.json({ message: "FIRS connection successful" });
+    } catch (error) {
+      res.status(400).json({ message: "FIRS connection failed: " + error.message });
+    }
+  });
+
+  app.post("/api/configuration/reset", async (req, res) => {
+    try {
+      // Reset to defaults
+      const defaultConfig = {
+        validationRules: ['strict_tin'],
+        autoCorrect: false,
+        strictValidation: true,
+        asyncProcessing: false,
+        retryAttempts: 3,
+        timeoutSeconds: 30,
+        firsApiUrl: "https://api.firs.gov.ng/mbs/v1",
+        firsApiKey: "",
+        webhookUrl: "",
+        maxFileSize: 10,
+        allowedFormats: ["xml", "json"]
+      };
+      
+      res.json(defaultConfig);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to reset configuration" });
     }
   });
 
