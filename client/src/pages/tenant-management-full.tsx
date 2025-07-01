@@ -79,7 +79,7 @@ export default function TenantManagementFull() {
 
   // Fetch users for selected tenant
   const { data: users = [], isLoading: usersLoading } = useQuery({
-    queryKey: ["/api/tenants", selectedTenant?.id, "users"],
+    queryKey: [`/api/tenants/${selectedTenant?.id}/users`],
     enabled: !!selectedTenant,
   });
 
@@ -137,7 +137,7 @@ export default function TenantManagementFull() {
       return await response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/tenants", selectedTenant?.id, "users"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/tenants/${selectedTenant?.id}/users`] });
       setShowCreateUser(false);
       userForm.reset();
       toast({ title: "Success", description: "User created successfully" });
@@ -157,7 +157,7 @@ export default function TenantManagementFull() {
       return await response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/tenants", selectedTenant?.id, "users"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/tenants/${selectedTenant?.id}/users`] });
       setShowEditUser(false);
       setEditingUser(null);
       userForm.reset();
@@ -177,7 +177,7 @@ export default function TenantManagementFull() {
       await apiRequest("DELETE", `/api/users/${userId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/tenants", selectedTenant?.id, "users"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/tenants/${selectedTenant?.id}/users`] });
       toast({ title: "Success", description: "User deleted successfully" });
     },
     onError: (error) => {
