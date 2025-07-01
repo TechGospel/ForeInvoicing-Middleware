@@ -46,6 +46,9 @@ export interface IStorage {
   // Dashboard methods
   getDashboardMetrics(tenantId: number): Promise<any>;
   getRecentActivity(tenantId: number): Promise<any[]>;
+  
+  // API usage methods
+  getApiUsageStatistics(tenantId: number): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -250,6 +253,66 @@ export class DatabaseStorage implements IStorage {
                   'Validation warning',
       timestamp: this.getRelativeTime(invoice.createdAt)
     }));
+  }
+
+  async getApiUsageStatistics(tenantId: number): Promise<any[]> {
+    try {
+      // Get invoice submission count for the tenant (last 24 hours)
+      const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      
+      const [invoiceSubmissions] = await db
+        .select({ count: count() })
+        .from(invoices)
+        .where(and(
+          eq(invoices.tenantId, tenantId),
+          gte(invoices.createdAt, last24Hours)
+        ));
+
+      // Get audit logs for API calls (last 24 hours)
+      const apiCallsCount = await db
+        .select({ 
+          action: auditLogs.action,
+          count: count()
+        })
+        .from(auditLogs)
+        .where(and(
+          eq(auditLogs.tenantId, tenantId),
+          gte(auditLogs.timestamp, last24Hours)
+        ))
+        .groupBy(auditLogs.action);
+
+      // Calculate progress percentages based on total calls
+      const totalCalls = invoiceSubmissions.count + apiCallsCount.reduce((sum, item) => sum + item.count, 0);
+      const maxCalls = Math.max(totalCalls, 100); // Ensure we have a reasonable max for progress calculation
+
+      // Build usage statistics
+      const usageStats = [
+        {
+          endpoint: "POST /api/invoices",
+          calls: invoiceSubmissions.count,
+          progress: totalCalls > 0 ? Math.min((invoiceSubmissions.count / maxCalls) * 100, 100) : 0,
+          color: "bg-primary"
+        }
+      ];
+
+      // Add other endpoints based on audit logs
+      apiCallsCount.forEach((item) => {
+        if (item.action !== 'submit') {
+          usageStats.push({
+            endpoint: `API ${item.action}`,
+            calls: item.count,
+            progress: totalCalls > 0 ? Math.min((item.count / maxCalls) * 100, 100) : 0,
+            color: item.action === 'create_tenant' ? "bg-green-500" : "bg-blue-500"
+          });
+        }
+      });
+
+      return usageStats;
+    } catch (error) {
+      console.error("Error fetching API usage statistics:", error);
+      // Return empty array on error
+      return [];
+    }
   }
 
   private getRelativeTime(date: Date): string {

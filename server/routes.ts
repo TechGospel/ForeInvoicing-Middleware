@@ -167,6 +167,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // API usage statistics for tenant
+  app.get("/api/usage/statistics", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const tenantId = req.user!.tenantId;
+      const usage = await storage.getApiUsageStatistics(tenantId);
+      res.json(usage);
+    } catch (error) {
+      console.error("Error fetching API usage statistics:", error);
+      res.status(500).json({ message: "Failed to fetch usage statistics" });
+    }
+  });
+
   // Invoice submission endpoint
   app.post("/api/invoices", authMiddleware, upload.single('invoice'), async (req: AuthRequest, res) => {
     try {

@@ -1,6 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { isUnauthorizedError } from "@/lib/authUtils";
 
 interface SystemStatusProps {
   status?: {
@@ -12,6 +17,29 @@ interface SystemStatusProps {
 }
 
 export function SystemStatus({ status }: SystemStatusProps) {
+  const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+
+  // Fetch API usage statistics
+  const { data: apiUsage, error: apiUsageError } = useQuery({
+    queryKey: ["/api/usage/statistics"],
+    enabled: isAuthenticated,
+  });
+
+  // Handle authentication errors
+  useEffect(() => {
+    if (apiUsageError && isUnauthorizedError(apiUsageError as Error)) {
+      toast({
+        title: "Unauthorized",
+        description: "You are logged out. Logging in again...",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 500);
+    }
+  }, [apiUsageError, toast]);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "operational":
@@ -51,11 +79,8 @@ export function SystemStatus({ status }: SystemStatusProps) {
     { name: "Validation Service", status: status?.validationService || "online" },
   ];
 
-  const apiUsage = [
-    { endpoint: "POST /api/invoices", calls: 1247, progress: 85, color: "bg-primary" },
-    { endpoint: "GET /api/invoices/{id}", calls: 892, progress: 60, color: "bg-green-500" },
-    { endpoint: "GET /api/audit-logs", calls: 234, progress: 20, color: "bg-blue-500" },
-  ];
+  // Use real API usage data or show loading/empty state
+  const usageData = Array.isArray(apiUsage) ? apiUsage : [];
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -89,7 +114,7 @@ export function SystemStatus({ status }: SystemStatusProps) {
           <CardTitle>API Usage (24h)</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {apiUsage.map((api) => (
+          {usageData.length > 0 ? usageData.map((api: any) => (
             <div key={api.endpoint} className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-foreground text-sm">{api.endpoint}</span>
@@ -97,7 +122,11 @@ export function SystemStatus({ status }: SystemStatusProps) {
               </div>
               <Progress value={api.progress} className="h-2" />
             </div>
-          ))}
+          )) : (
+            <div className="text-center py-4 text-gray-500 dark:text-gray-400">
+              No API usage data available
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
