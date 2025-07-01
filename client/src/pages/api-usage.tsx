@@ -46,9 +46,9 @@ export default function ApiUsage() {
   // Filters and pagination state
   const [page, setPage] = useState(1);
   const [limit] = useState(25);
-  const [endpointFilter, setEndpointFilter] = useState<string>("");
-  const [methodFilter, setMethodFilter] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [endpointFilter, setEndpointFilter] = useState<string>("all");
+  const [methodFilter, setMethodFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({
     from: subDays(new Date(), 7),
     to: new Date()
@@ -62,9 +62,9 @@ export default function ApiUsage() {
     limit: limit.toString(),
     sortField,
     sortOrder,
-    ...(endpointFilter && { endpoint: endpointFilter }),
-    ...(methodFilter && { method: methodFilter }),
-    ...(statusFilter && { status: statusFilter }),
+    ...(endpointFilter && endpointFilter !== "all" && { endpoint: endpointFilter }),
+    ...(methodFilter && methodFilter !== "all" && { method: methodFilter }),
+    ...(statusFilter && statusFilter !== "all" && { status: statusFilter }),
     ...(dateRange.from && { fromDate: format(startOfDay(dateRange.from), 'yyyy-MM-dd') }),
     ...(dateRange.to && { toDate: format(endOfDay(dateRange.to), 'yyyy-MM-dd') })
   });
@@ -113,9 +113,9 @@ export default function ApiUsage() {
 
   // Clear all filters
   const clearFilters = () => {
-    setEndpointFilter("");
-    setMethodFilter("");
-    setStatusFilter("");
+    setEndpointFilter("all");
+    setMethodFilter("all");
+    setStatusFilter("all");
     setDateRange({ from: subDays(new Date(), 7), to: new Date() });
     setPage(1);
   };
@@ -176,7 +176,7 @@ export default function ApiUsage() {
                   <SelectValue placeholder="All endpoints" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All endpoints</SelectItem>
+                  <SelectItem value="all">All endpoints</SelectItem>
                   {uniqueEndpoints.map(endpoint => (
                     <SelectItem key={endpoint} value={endpoint}>{endpoint}</SelectItem>
                   ))}
@@ -192,7 +192,7 @@ export default function ApiUsage() {
                   <SelectValue placeholder="All methods" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All methods</SelectItem>
+                  <SelectItem value="all">All methods</SelectItem>
                   {uniqueMethods.map(method => (
                     <SelectItem key={method} value={method}>{method}</SelectItem>
                   ))}
@@ -208,7 +208,7 @@ export default function ApiUsage() {
                   <SelectValue placeholder="All statuses" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All statuses</SelectItem>
+                  <SelectItem value="all">All statuses</SelectItem>
                   {statusCodes.map(status => (
                     <SelectItem key={status} value={status}>{status}</SelectItem>
                   ))}
