@@ -11,6 +11,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Send, Loader2 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
+import { isUnauthorizedError } from "@/lib/authUtils";
 
 export function InvoiceForm() {
   const [formData, setFormData] = useState({
@@ -25,11 +28,27 @@ export function InvoiceForm() {
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isAuthenticated } = useAuth();
   
   // Fetch tenants for dropdown
-  const { data: tenants, isLoading: tenantsLoading } = useQuery({
+  const { data: tenants, isLoading: tenantsLoading, error: tenantsError } = useQuery({
     queryKey: ["/api/tenants"],
+    enabled: isAuthenticated,
   });
+
+  // Handle authentication errors for tenants query
+  useEffect(() => {
+    if (tenantsError && isUnauthorizedError(tenantsError as Error)) {
+      toast({
+        title: "Unauthorized",
+        description: "You are logged out. Logging in again...",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 500);
+    }
+  }, [tenantsError, toast]);
 
   const submitMutation = useMutation({
     mutationFn: async (data: FormData) => {
@@ -45,6 +64,17 @@ export function InvoiceForm() {
       setSelectedFile(null);
     },
     onError: (error: any) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 500);
+        return;
+      }
       toast({
         title: "Submission Failed",
         description: error.message,

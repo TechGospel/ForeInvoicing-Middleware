@@ -128,30 +128,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Dashboard metrics (temporarily bypassing auth for demo)
-  app.get("/api/dashboard/metrics", async (req: AuthRequest, res) => {
+  // Dashboard metrics
+  app.get("/api/dashboard/metrics", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const tenantId = 1; // Demo tenant
+      const tenantId = req.user!.tenantId;
       const metrics = await storage.getDashboardMetrics(tenantId);
       res.json(metrics);
     } catch (error) {
+      console.error("Error fetching dashboard metrics:", error);
       res.status(500).json({ message: "Failed to fetch metrics" });
     }
   });
 
-  // Recent activity (temporarily bypassing auth for demo)
-  app.get("/api/dashboard/activity", async (req: AuthRequest, res) => {
+  // Recent activity
+  app.get("/api/dashboard/activity", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const tenantId = 1; // Demo tenant
+      const tenantId = req.user!.tenantId;
       const activity = await storage.getRecentActivity(tenantId);
       res.json(activity);
     } catch (error) {
+      console.error("Error fetching dashboard activity:", error);
       res.status(500).json({ message: "Failed to fetch activity" });
     }
   });
 
-  // System status (temporarily bypassing auth for demo)
-  app.get("/api/system/status", async (req, res) => {
+  // System status
+  app.get("/api/system/status", authMiddleware, async (req: AuthRequest, res) => {
     try {
       const status = {
         firsApi: "operational",

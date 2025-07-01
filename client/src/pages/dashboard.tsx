@@ -9,19 +9,69 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { FileText, Search, Code, TrendingUp } from "lucide-react";
 import { Link } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { isUnauthorizedError } from "@/lib/authUtils";
 
 export default function Dashboard() {
-  const { data: metrics } = useQuery({
+  const { toast } = useToast();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+
+  const { data: metrics, error: metricsError } = useQuery({
     queryKey: ["/api/dashboard/metrics"],
+    enabled: isAuthenticated,
   });
 
-  const { data: activity } = useQuery({
+  const { data: activity, error: activityError } = useQuery({
     queryKey: ["/api/dashboard/activity"],
+    enabled: isAuthenticated,
   });
 
-  const { data: systemStatus } = useQuery({
+  const { data: systemStatus, error: systemError } = useQuery({
     queryKey: ["/api/system/status"],
+    enabled: isAuthenticated,
   });
+
+  // Handle authentication errors
+  useEffect(() => {
+    const errors = [metricsError, activityError, systemError].filter(Boolean);
+    for (const error of errors) {
+      if (error && isUnauthorizedError(error as Error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 500);
+        return;
+      }
+    }
+  }, [metricsError, activityError, systemError, toast]);
+
+  if (authLoading) {
+    return <div className="p-4 sm:p-6">Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="p-4 sm:p-6">
+        <div className="text-center py-8">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            Please Log In
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            You need to be logged in to view the dashboard.
+          </p>
+          <Button onClick={() => window.location.href = "/login"}>
+            Go to Login
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
