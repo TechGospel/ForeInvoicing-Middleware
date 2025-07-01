@@ -103,6 +103,7 @@ export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
 // Insert schemas
 export const insertTenantSchema = createInsertSchema(tenants).omit({
   id: true,
+  apiKey: true,
   createdAt: true,
   updatedAt: true,
 });
