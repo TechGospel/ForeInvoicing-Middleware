@@ -113,11 +113,8 @@ export default function TenantManagementFull() {
   // Mutations
   const createTenantMutation = useMutation({
     mutationFn: async (data: TenantForm) => {
-      const response = await apiRequest("/api/tenants", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-      return response;
+      const response = await apiRequest("POST", "/api/tenants", data);
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tenants"] });
@@ -136,11 +133,8 @@ export default function TenantManagementFull() {
 
   const createUserMutation = useMutation({
     mutationFn: async (data: UserForm) => {
-      const response = await apiRequest(`/api/tenants/${selectedTenant!.id}/users`, {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-      return response;
+      const response = await apiRequest("POST", `/api/tenants/${selectedTenant!.id}/users`, data);
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tenants", selectedTenant?.id, "users"] });
@@ -159,11 +153,8 @@ export default function TenantManagementFull() {
 
   const updateUserMutation = useMutation({
     mutationFn: async (data: Partial<UserForm>) => {
-      const response = await apiRequest(`/api/users/${editingUser!.id}`, {
-        method: "PUT",
-        body: JSON.stringify(data),
-      });
-      return response;
+      const response = await apiRequest("PUT", `/api/users/${editingUser!.id}`, data);
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tenants", selectedTenant?.id, "users"] });
@@ -183,7 +174,7 @@ export default function TenantManagementFull() {
 
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: number) => {
-      await apiRequest(`/api/users/${userId}`, { method: "DELETE" });
+      await apiRequest("DELETE", `/api/users/${userId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tenants", selectedTenant?.id, "users"] });
@@ -200,10 +191,8 @@ export default function TenantManagementFull() {
 
   const regenerateApiKeyMutation = useMutation({
     mutationFn: async (tenantId: number) => {
-      const response = await apiRequest(`/api/tenants/${tenantId}/regenerate-key`, {
-        method: "POST",
-      });
-      return response;
+      const response = await apiRequest("POST", `/api/tenants/${tenantId}/regenerate-key`);
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tenants"] });
