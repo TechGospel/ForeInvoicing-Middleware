@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -143,11 +143,11 @@ export default function Configuration() {
   });
 
   // Load config data into form when available
-  useState(() => {
+  useEffect(() => {
     if (config && !hasChanges) {
       form.reset(config);
     }
-  }, [config]);
+  }, [config, hasChanges, form]);
 
   const onSubmit = (data: ConfigForm) => {
     updateConfigMutation.mutate(data);

@@ -9,7 +9,7 @@ import Dashboard from "@/pages/dashboard";
 import SubmitInvoice from "@/pages/submit-invoice";
 import InvoiceHistory from "@/pages/invoice-history";
 import AuditLogs from "@/pages/audit-logs";
-import TenantManagement from "@/pages/tenant-management";
+import TenantManagement from "@/pages/tenant-management-simple";
 import Configuration from "@/pages/configuration";
 import ApiDocs from "@/pages/api-docs";
 import Login from "@/pages/login";
@@ -22,8 +22,7 @@ function Router() {
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header title="FIRS MBS API" subtitle="Invoice Processing System" />
+      <div className="flex-1 flex flex-col overflow-hidden ml-64">
         <main className="flex-1 overflow-auto">
           <Switch>
             <Route path="/" component={Dashboard} />

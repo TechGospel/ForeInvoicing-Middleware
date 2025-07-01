@@ -40,10 +40,52 @@ export default function TenantManagement() {
   const [isCreateUserOpen, setIsCreateUserOpen] = useState(false);
   const [isEditTenantOpen, setIsEditTenantOpen] = useState(false);
 
+  // Mock data for demo purposes
+  const mockTenants = [
+    {
+      id: 1,
+      name: "ABC Corporation",
+      tin: "12345678-0001",
+      email: "admin@abc-corp.com",
+      apiKey: "api_abc_12345678",
+      isActive: true,
+      createdAt: "2024-01-15"
+    },
+    {
+      id: 2,
+      name: "XYZ Limited",
+      tin: "87654321-0002",
+      email: "admin@xyz-ltd.com",
+      apiKey: "api_xyz_87654321",
+      isActive: false,
+      createdAt: "2024-02-10"
+    }
+  ];
+
   // Fetch tenant data
   const { data: tenants, isLoading: tenantsLoading } = useQuery({
     queryKey: ["/api/tenants"],
   });
+
+  // Mock users for demo purposes
+  const mockUsers = [
+    {
+      id: 1,
+      username: "john_admin",
+      email: "john@abc-corp.com",
+      role: "admin",
+      isActive: true,
+      tenantId: 1
+    },
+    {
+      id: 2,
+      username: "jane_user",
+      email: "jane@abc-corp.com",
+      role: "user",
+      isActive: true,
+      tenantId: 1
+    }
+  ];
 
   // Fetch users for selected tenant
   const { data: users, isLoading: usersLoading } = useQuery({
@@ -208,7 +250,7 @@ export default function TenantManagement() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {tenants?.map((tenant: any) => (
+            {(tenants || mockTenants).map((tenant: any) => (
               <div
                 key={tenant.id}
                 className={`p-4 border rounded-lg cursor-pointer transition-colors ${
