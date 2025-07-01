@@ -91,11 +91,19 @@ The system uses a multi-tenant PostgreSQL database with the following core entit
 - **Database**: Neon serverless PostgreSQL for development
 - **Environment Variables**: DATABASE_URL, JWT_SECRET, FIRS_API_URL, FIRS_API_KEY
 
+## Docker Containerization
+- **Multi-stage Dockerfile**: Optimized production build with Alpine Linux base
+- **Container Security**: Non-root user execution with minimal privileges
+- **Service Orchestration**: Docker Compose with PostgreSQL, Redis, and Nginx
+- **Development Setup**: Separate dev override with hot reloading
+- **Production Configuration**: Health checks, resource limits, and security hardening
+
 ## Production Build
 - **Frontend**: Vite builds optimized React bundle to `dist/public`
 - **Backend**: esbuild compiles TypeScript server to `dist/index.js`
 - **Database Migrations**: Drizzle Kit handles schema migrations
 - **Static Serving**: Express serves built frontend assets in production
+- **Reverse Proxy**: Nginx with rate limiting, gzip compression, and security headers
 
 ## Scalability Considerations
 - **Stateless Design**: JWT-based authentication enables horizontal scaling
@@ -109,6 +117,7 @@ The system uses a multi-tenant PostgreSQL database with the following core entit
 Changelog:
 - July 01, 2025. Initial setup
 - July 01, 2025. Added bulk invoice submission feature with individual processing
+- July 01, 2025. Implemented comprehensive Docker containerization with production-grade security
 ```
 
 # User Preferences

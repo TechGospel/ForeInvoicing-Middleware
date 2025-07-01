@@ -1,0 +1,47 @@
+version: '3.8'
+
+# Development override for docker-compose.yml
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: firs_mbs_dev
+      POSTGRES_USER: dev_admin
+      POSTGRES_PASSWORD: dev_password
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+
+  redis:
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass dev_redis_password
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://dev_admin:dev_password@postgres:5432/firs_mbs_dev
+      REDIS_URL: redis://:dev_redis_password@redis:6379
+      JWT_SECRET: dev_jwt_secret_not_for_production
+      SESSION_SECRET: dev_session_secret_not_for_production
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - app_dev_uploads:/app/uploads
+    command: npm run dev
+    ports:
+      - "5000:5000"
+      - "3000:3000"  # Vite dev server
+
+  # Remove nginx for development
+  nginx:
+    profiles:
+      - disabled
+
+volumes:
+  postgres_dev_data:
+  app_dev_uploads:

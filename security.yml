@@ -1,0 +1,142 @@
+# Security Configuration for FIRS MBS Invoice Middleware
+# This file defines security policies for Docker deployment
+
+# Docker Security Policies
+docker_security:
+  # Base image security
+  base_images:
+    - node:20-alpine  # Latest LTS Alpine for minimal attack surface
+    - postgres:15-alpine  # Latest stable PostgreSQL Alpine
+    - redis:7-alpine  # Latest Redis Alpine
+    - nginx:alpine  # Latest Nginx Alpine
+
+  # User security
+  non_root_execution:
+    enabled: true
+    user_id: 1001
+    group_id: 1001
+    user_name: nodejs
+
+  # Network security
+  network_isolation:
+    enabled: true
+    custom_bridge_network: firs-network
+    expose_only_necessary_ports: true
+    internal_communication_only: true
+
+  # Container hardening
+  container_hardening:
+    read_only_root_filesystem: false  # App needs write access to uploads
+    no_new_privileges: true
+    drop_capabilities:
+      - ALL
+    add_capabilities: []
+    seccomp_profile: default
+    apparmor_profile: default
+
+# Application Security Policies
+application_security:
+  # Authentication & Authorization
+  auth:
+    jwt_expiration: 24h
+    session_timeout: 1h
+    password_policy:
+      min_length: 8
+      require_special_chars: true
+      require_numbers: true
+      require_uppercase: true
+
+  # API Security
+  api_security:
+    rate_limiting:
+      general_api: 100/hour
+      auth_endpoints: 5/minute
+      file_upload: 10/hour
+    request_size_limit: 10MB
+    cors_origins: 
+      - https://your-domain.com
+      - http://localhost:3000  # Development only
+
+  # Data Protection
+  data_protection:
+    encryption_at_rest: true
+    encryption_in_transit: true
+    pii_data_handling: strict
+    audit_logging: comprehensive
+
+# Infrastructure Security
+infrastructure_security:
+  # Database Security
+  database:
+    encrypted_connections: true
+    connection_pooling: true
+    backup_encryption: true
+    access_restrictions: true
+
+  # Redis Security
+  redis:
+    password_protected: true
+    encrypted_connections: true
+    access_restrictions: true
+
+  # Reverse Proxy Security
+  nginx:
+    security_headers:
+      - X-Frame-Options: DENY
+      - X-Content-Type-Options: nosniff
+      - X-XSS-Protection: "1; mode=block"
+      - Strict-Transport-Security: "max-age=31536000; includeSubDomains; preload"
+      - Referrer-Policy: strict-origin-when-cross-origin
+    rate_limiting: enabled
+    ddos_protection: basic
+
+# Compliance & Monitoring
+compliance:
+  # Audit Requirements
+  audit_logging:
+    retention_period: 7_years
+    log_level: info
+    sensitive_data_masking: true
+    real_time_monitoring: true
+
+  # FIRS Compliance
+  firs_compliance:
+    data_residency: nigeria
+    encryption_standards: aes256
+    access_logging: mandatory
+    invoice_retention: 7_years
+
+  # Security Monitoring
+  monitoring:
+    vulnerability_scanning: weekly
+    container_scanning: on_build
+    dependency_scanning: daily
+    log_analysis: real_time
+
+# Incident Response
+incident_response:
+  # Automated Response
+  automated_actions:
+    rate_limit_breach: block_ip
+    failed_authentication: temporary_lockout
+    suspicious_activity: alert_admin
+
+  # Manual Response
+  escalation_procedures:
+    security_breach: immediate
+    data_leak: immediate
+    system_compromise: immediate
+
+# Backup & Recovery
+backup_recovery:
+  # Backup Security
+  backup_encryption: aes256
+  backup_retention: 90_days
+  backup_testing: monthly
+  offsite_backup: enabled
+
+  # Recovery Procedures
+  rto: 4_hours  # Recovery Time Objective
+  rpo: 1_hour   # Recovery Point Objective
+  backup_verification: automated
+  disaster_recovery_testing: quarterly
