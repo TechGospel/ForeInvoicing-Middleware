@@ -8,6 +8,7 @@ import { MobileHeader } from "@/components/layout/mobile-header";
 import { useState } from "react";
 import Dashboard from "@/pages/dashboard";
 import SubmitInvoice from "@/pages/submit-invoice";
+import BulkInvoice from "@/pages/bulk-invoice";
 import InvoiceHistory from "@/pages/invoice-history";
 import AuditLogs from "@/pages/audit-logs";
 import TenantManagement from "@/pages/tenant-management-simple";
@@ -52,6 +53,7 @@ function Router() {
                   <Switch>
                     <Route path="/" component={Dashboard} />
                     <Route path="/submit-invoice" component={SubmitInvoice} />
+                    <Route path="/bulk-invoice" component={BulkInvoice} />
                     <Route path="/invoice-history" component={InvoiceHistory} />
                     <Route path="/audit-logs" component={AuditLogs} />
                     <Route

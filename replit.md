@@ -30,11 +30,12 @@ The system uses a multi-tenant PostgreSQL database with the following core entit
 # Key Components
 
 ## Invoice Processing Pipeline
-1. **File Upload & Validation**: Accepts XML (UBL 3.0) and JSON invoice formats
+1. **File Upload & Validation**: Accepts XML (UBL 3.0) and JSON invoice formats (single or bulk)
 2. **Format Normalization**: Converts all inputs to standardized UBL 3.0 XML internally
 3. **Business Rules Validation**: Validates TIN formats, tax calculations, and required fields
 4. **FIRS Integration**: Submits validated invoices to FIRS MBS API with retry logic
 5. **Status Tracking**: Maintains invoice state throughout the processing lifecycle
+6. **Bulk Processing**: Processes multiple invoices individually from a single upload with batch tracking
 
 ## Authentication & Authorization
 - **Multi-tenant Architecture**: Tenant isolation with API key-based access
@@ -107,6 +108,7 @@ The system uses a multi-tenant PostgreSQL database with the following core entit
 ```
 Changelog:
 - July 01, 2025. Initial setup
+- July 01, 2025. Added bulk invoice submission feature with individual processing
 ```
 
 # User Preferences

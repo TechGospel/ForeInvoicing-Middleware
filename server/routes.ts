@@ -405,6 +405,296 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Bulk invoice submission endpoint
+  app.post("/api/invoices/bulk", authMiddleware, upload.single('bulkInvoices'), async (req: AuthRequest, res) => {
+    try {
+      const tenantId = req.user?.tenantId || 1;
+      const userId = req.user?.userId;
+      
+      if (!tenantId) {
+        return res.status(400).json({ message: "Tenant ID is required" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "Bulk invoice file is required" });
+      }
+
+      const fs = await import('fs');
+      const fileContent = fs.readFileSync(req.file.path, 'utf8');
+      const format = req.body.format || 'json';
+      
+      let invoicesData: any[] = [];
+
+      try {
+        if (format === 'json') {
+          const parsedData = JSON.parse(fileContent);
+          invoicesData = Array.isArray(parsedData) ? parsedData : [parsedData];
+        } else if (format === 'xml') {
+          // For XML, we expect multiple XML documents separated by delimiters
+          // Split by common XML document separators or root elements
+          const xmlDocuments = fileContent
+            .split(/(?=<\?xml|<invoice|<Invoice)/)
+            .filter(doc => doc.trim().length > 0);
+          invoicesData = xmlDocuments;
+        } else {
+          return res.status(400).json({ message: "Unsupported bulk format" });
+        }
+      } catch (parseError) {
+        return res.status(400).json({ 
+          message: "Failed to parse bulk invoice file", 
+          error: parseError.message 
+        });
+      }
+
+      // Clean up uploaded file
+      fs.unlinkSync(req.file.path);
+
+      if (invoicesData.length === 0) {
+        return res.status(400).json({ message: "No invoices found in the bulk file" });
+      }
+
+      const batchId = `BULK-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Log bulk submission start
+      await auditLogger.log({
+        tenantId,
+        userId,
+        action: "bulk_submit",
+        level: "info",
+        message: `Bulk invoice submission started with ${invoicesData.length} invoices`,
+        metadata: { 
+          batchId,
+          format, 
+          priority: req.body.priority || "normal",
+          totalInvoices: invoicesData.length
+        }
+      });
+
+      const results: Array<{
+        invoiceNumber: string;
+        status: 'success' | 'failed' | 'processing';
+        invoiceId?: number;
+        irn?: string;
+        error?: string;
+      }> = [];
+
+      let processedCount = 0;
+      let successCount = 0;
+      let failureCount = 0;
+
+      // Process each invoice individually
+      const processInvoice = async (invoiceData: any, index: number) => {
+        let invoiceNumber = `BULK-${index + 1}-${Date.now()}`;
+        
+        try {
+          // Validate invoice
+          const validationResult = await invoiceValidator.validate(invoiceData, format);
+          
+          if (!validationResult.isValid) {
+            await auditLogger.log({
+              tenantId,
+              userId,
+              action: "bulk_validate",
+              level: "error",
+              message: `Bulk invoice ${index + 1} validation failed`,
+              metadata: { 
+                batchId,
+                invoiceIndex: index + 1,
+                errors: validationResult.errors 
+              }
+            });
+
+            results.push({
+              invoiceNumber,
+              status: 'failed',
+              error: validationResult.errors.join(', ')
+            });
+            failureCount++;
+            processedCount++;
+            return;
+          }
+
+          // Normalize to UBL 3.0 format
+          const normalizedData = await invoiceValidator.normalize(invoiceData, format);
+
+          // Extract invoice details
+          const supplierTin = normalizedData.supplier?.tin || "";
+          const buyerTin = normalizedData.buyer?.tin || "";
+          const totalAmount = normalizedData.total?.amount || "0";
+          invoiceNumber = normalizedData.invoiceNumber || invoiceNumber;
+
+          // Create invoice record
+          const invoice = await storage.createInvoice({
+            tenantId,
+            invoiceNumber,
+            supplierTin,
+            buyerTin,
+            totalAmount,
+            status: "validated",
+            originalFormat: format,
+            originalData: invoiceData,
+            normalizedData,
+            priority: req.body.priority || "normal"
+          });
+
+          // Submit to FIRS
+          try {
+            const firsResult = await firsAdapter.submitInvoice(normalizedData);
+            
+            await storage.updateInvoice(invoice.id, {
+              status: "success",
+              firsIrn: firsResult.irn,
+              firsQrCode: firsResult.qrCode,
+              firsResponse: firsResult
+            });
+
+            await auditLogger.log({
+              tenantId,
+              invoiceId: invoice.id,
+              action: "bulk_success",
+              level: "info",
+              message: `Bulk invoice ${index + 1} successfully submitted to FIRS`,
+              metadata: { 
+                batchId,
+                invoiceIndex: index + 1,
+                irn: firsResult.irn 
+              }
+            });
+
+            results.push({
+              invoiceNumber,
+              status: 'success',
+              invoiceId: invoice.id,
+              irn: firsResult.irn
+            });
+            successCount++;
+          } catch (firsError) {
+            await storage.updateInvoice(invoice.id, {
+              status: "failed",
+              validationErrors: { firsError: firsError.message }
+            });
+
+            await auditLogger.log({
+              tenantId,
+              invoiceId: invoice.id,
+              action: "bulk_error",
+              level: "error",
+              message: `Bulk invoice ${index + 1} FIRS submission failed`,
+              metadata: { 
+                batchId,
+                invoiceIndex: index + 1,
+                error: firsError.message 
+              }
+            });
+
+            results.push({
+              invoiceNumber,
+              status: 'failed',
+              invoiceId: invoice.id,
+              error: firsError.message
+            });
+            failureCount++;
+          }
+        } catch (error) {
+          await auditLogger.log({
+            tenantId,
+            userId,
+            action: "bulk_error",
+            level: "error",
+            message: `Bulk invoice ${index + 1} processing failed`,
+            metadata: { 
+              batchId,
+              invoiceIndex: index + 1,
+              error: error.message 
+            }
+          });
+
+          results.push({
+            invoiceNumber,
+            status: 'failed',
+            error: error.message
+          });
+          failureCount++;
+        }
+        
+        processedCount++;
+      };
+
+      // Process invoices
+      if (req.body.asyncProcessing === 'true') {
+        // Process asynchronously - return immediate response
+        setImmediate(async () => {
+          for (let i = 0; i < invoicesData.length; i++) {
+            await processInvoice(invoicesData[i], i);
+          }
+          
+          await auditLogger.log({
+            tenantId,
+            userId,
+            action: "bulk_complete",
+            level: "info",
+            message: `Bulk invoice submission completed`,
+            metadata: { 
+              batchId,
+              totalInvoices: invoicesData.length,
+              successCount,
+              failureCount
+            }
+          });
+        });
+
+        // Return immediate response
+        res.json({
+          batchId,
+          totalInvoices: invoicesData.length,
+          processedCount: 0,
+          successCount: 0,
+          failureCount: 0,
+          status: 'processing',
+          results: invoicesData.map((_, index) => ({
+            invoiceNumber: `Processing invoice ${index + 1}...`,
+            status: 'processing' as const
+          }))
+        });
+      } else {
+        // Process synchronously
+        for (let i = 0; i < invoicesData.length; i++) {
+          await processInvoice(invoicesData[i], i);
+        }
+
+        await auditLogger.log({
+          tenantId,
+          userId,
+          action: "bulk_complete",
+          level: "info",
+          message: `Bulk invoice submission completed`,
+          metadata: { 
+            batchId,
+            totalInvoices: invoicesData.length,
+            successCount,
+            failureCount
+          }
+        });
+
+        res.json({
+          batchId,
+          totalInvoices: invoicesData.length,
+          processedCount,
+          successCount,
+          failureCount,
+          status: 'completed',
+          results
+        });
+      }
+    } catch (error) {
+      console.error("Bulk invoice submission error:", error);
+      res.status(500).json({ 
+        message: "Bulk invoice submission failed", 
+        error: error.message 
+      });
+    }
+  });
+
   // Get invoice by ID
   app.get("/api/invoices/:id", authMiddleware, async (req, res) => {
     try {
