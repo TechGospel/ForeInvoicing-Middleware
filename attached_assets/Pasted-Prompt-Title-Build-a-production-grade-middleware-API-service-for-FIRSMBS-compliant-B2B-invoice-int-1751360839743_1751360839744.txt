@@ -1,0 +1,122 @@
+Prompt Title:
+
+Build a production-grade middleware API service for FIRSMBS-compliant B2B invoice integration
+
+Prompt:
+
+You are a senior software architect and engineer tasked with building a scalable, production-grade middleware API service that integrates with the FIRS MBS e-invoicing engine in Nigeria. This middleware must allow compliant B2B invoice submission, validation, and government-side integration.
+
+The middleware should be implemented using Node.js (NestJS) or Go (Gin/Fiber) in a microservice-ready architecture, and must support secure API-based communication, multi-tenancy, and asynchronous processing.
+
+Follow these implementation requirements strictly:
+
+🔧 Core Functional Requirements:
+
+Invoice Submission API
+
+Endpoint: POST /api/invoices
+
+Accepts B2B invoices in BIS UBL 3.0 XML or JSON mapped format
+
+Validates required fields (e.g., supplier TIN, buyer TIN, line items, taxes, total)
+
+Logs all incoming payloads and metadata
+
+Validation Engine
+
+Validate fields per FIRSMBS schema rules (e.g., VAT number structure, tax calculation, item descriptions)
+
+Return 400 with clear validation error codes/messages
+
+Allow configuration of custom field validation rules per tenant
+
+FIRS Integration Module
+
+Transforms and sends compliant invoices to FIRSMBS endpoint
+
+Handles authentication and retries (exponential backoff)
+
+Retrieves IRN (Invoice Reference Number) and QR code response
+
+Updates invoice record with response and status
+
+Invoice Format Standardizer
+
+Accept incoming invoice payloads from different systems (SAP, QuickBooks, Zoho, Oracle)
+
+Normalize into BIS UBL 3.0 XML internally
+
+Log mapping errors or transformation issues
+
+Error & Audit Logging
+
+Store logs for every invoice submitted (status, errors, retries, responses)
+
+Include invoiceId, tenantId, timestamps, error codes, FIRS response metadata
+
+Multi-tenancy Support
+
+Use tenantId in API key/token for request scoping
+
+Support per-tenant configuration: validation rules, mapping templates, FIRS credentials
+
+Security & Auth
+
+Secure API with OAuth2 or JWT
+
+Encrypt sensitive fields at rest (e.g., TINs, invoice amounts)
+
+Monitoring & Observability
+
+Expose Prometheus metrics or OpenTelemetry spans
+
+Include structured logs for external observability platforms (e.g., Datadog, Loki)
+
+🧱 Technical Requirements:
+
+Language: Node.js (NestJS) or Go (Gin/Fiber)
+
+API Docs: Generate using OpenAPI 3.1 / Swagger
+
+DB: PostgreSQL (with support for multi-tenancy), Redis (for async task queuing), S3 or local blob storage for PDFs/XML
+
+Validation: Use XML schema validation for UBL + custom business rule validators
+
+Code Structure: Layered architecture (DTOs, services, repositories, adapters)
+
+Deployment: Docker-ready, 12-factor compliant, deployable via Kubernetes or ECS
+
+Include unit tests and Postman collection for API testing
+
+✅ Output Expectations:
+
+Full backend codebase in organized folder structure
+
+Swagger documentation or Postman collection
+
+.env.example and config templates
+
+Dockerfile and docker-compose.yml
+
+Sample UBL 3.0 XML files and test payloads
+
+README explaining setup and usage
+
+⚠️ Assume FIRS endpoints and credentials are mocked.
+Build your service to allow simple replacement of mock adapter with live credentials and endpoints.
+
+Begin by scaffolding the project structure, then generate each module in order:
+
+API endpoint
+
+UBL validator
+
+Mapping/Normalizer
+
+FIRS integration adapter
+
+Logging and audit service
+
+Authentication and tenant handling
+
+End with test coverage, environment configs, and run scripts.
