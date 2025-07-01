@@ -14,6 +14,7 @@ import TenantManagement from "@/pages/tenant-management-simple";
 import TenantManagementFull from "@/pages/tenant-management-full";
 import Configuration from "@/pages/configuration";
 import ApiDocs from "@/pages/api-docs";
+import ApiUsage from "@/pages/api-usage";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import NotFound from "@/pages/not-found";
@@ -63,6 +64,7 @@ function Router() {
                     />
                     <Route path="/configuration" component={Configuration} />
                     <Route path="/api-docs" component={ApiDocs} />
+                    <Route path="/api-usage" component={ApiUsage} />
                     <Route component={NotFound} />
                   </Switch>
                 </main>

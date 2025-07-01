@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
@@ -110,8 +112,11 @@ export function SystemStatus({ status }: SystemStatusProps) {
       </Card>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle>API Usage (24h)</CardTitle>
+          <Link href="/api-usage">
+            <Button variant="outline" size="sm">View All</Button>
+          </Link>
         </CardHeader>
         <CardContent className="space-y-4">
           {usageData.length > 0 ? usageData.map((api: any) => (

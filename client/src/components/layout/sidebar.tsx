@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { DollarSign, BarChart3, Send, FileText, Users, Settings, Book, ClipboardList, LogOut, Menu, X } from "lucide-react";
+import { DollarSign, BarChart3, Send, FileText, Users, Settings, Book, ClipboardList, Activity, LogOut, Menu, X } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,6 +9,7 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
   { name: "Submit Invoice", href: "/submit-invoice", icon: Send },
   { name: "Invoice History", href: "/invoice-history", icon: FileText },
+  { name: "API Usage", href: "/api-usage", icon: Activity },
   { name: "Tenant Management", href: "/tenant-management-full", icon: Users },
   { name: "Configuration", href: "/configuration", icon: Settings },
   { name: "API Documentation", href: "/api-docs", icon: Book },

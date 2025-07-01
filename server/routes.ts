@@ -179,6 +179,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Detailed API usage with filtering and pagination
+  app.get("/api/usage/detailed", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const tenantId = req.user!.tenantId;
+      
+      const {
+        page = "1",
+        limit = "25",
+        endpoint,
+        method,
+        status,
+        fromDate,
+        toDate,
+        sortField = "timestamp",
+        sortOrder = "desc"
+      } = req.query;
+
+      const pageNum = parseInt(page as string, 10);
+      const limitNum = parseInt(limit as string, 10);
+
+      const filters = {
+        endpoint: endpoint as string,
+        method: method as string,
+        status: status ? parseInt(status as string, 10) : undefined,
+        fromDate: fromDate as string,
+        toDate: toDate as string,
+        sortField: sortField as string,
+        sortOrder: sortOrder as string
+      };
+
+      const result = await storage.getDetailedApiUsage(tenantId, pageNum, limitNum, filters);
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching detailed API usage:", error);
+      res.status(500).json({ message: "Failed to fetch detailed API usage" });
+    }
+  });
+
   // Invoice submission endpoint
   app.post("/api/invoices", authMiddleware, upload.single('invoice'), async (req: AuthRequest, res) => {
     try {
