@@ -25,9 +25,9 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen flex bg-gray-50">
-      <Sidebar />
+      {/* <Sidebar /> */}
       
-      <div className="flex-1 ml-64">
+      <div className="flex-1">
         <Header 
           title="Dashboard"
           subtitle="Monitor your FIRS MBS invoice integrations"

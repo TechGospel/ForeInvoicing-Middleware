@@ -3,44 +3,67 @@ import { Header } from "@/components/layout/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, RefreshCw, AlertCircle, Info, AlertTriangle } from "lucide-react";
+import {
+  Loader2,
+  RefreshCw,
+  AlertCircle,
+  Info,
+  AlertTriangle,
+} from "lucide-react";
 import { useState } from "react";
 
 export default function AuditLogs() {
   const [page, setPage] = useState(1);
-  
-  const { data: logs, isLoading, refetch } = useQuery({
+
+  const {
+    data: logs,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["/api/audit-logs", { page, limit: 50 }],
   });
 
   const getLevelIcon = (level: string) => {
     switch (level) {
-      case "error": return <AlertCircle className="h-4 w-4 text-red-500" />;
-      case "warning": return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-      default: return <Info className="h-4 w-4 text-blue-500" />;
+      case "error":
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
+      case "warning":
+        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+      default:
+        return <Info className="h-4 w-4 text-blue-500" />;
     }
   };
 
   const getLevelColor = (level: string) => {
     switch (level) {
-      case "error": return "bg-red-100 text-red-800";
-      case "warning": return "bg-yellow-100 text-yellow-800";
-      default: return "bg-blue-100 text-blue-800";
+      case "error":
+        return "bg-red-100 text-red-800";
+      case "warning":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-blue-100 text-blue-800";
     }
   };
 
   return (
     <div className="min-h-screen flex bg-gray-50">
-      <Sidebar />
-      
-      <div className="flex-1 ml-64">
-        <Header 
+      {/* <Sidebar /> */}
+
+      <div className="flex-1">
+        <Header
           title="Audit Logs"
           subtitle="Monitor system activity and troubleshoot issues"
         />
-        
+
         <main className="p-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
