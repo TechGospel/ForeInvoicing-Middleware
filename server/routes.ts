@@ -727,16 +727,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get audit logs (temporarily bypassing auth for demo)
-  app.get("/api/audit-logs", async (req, res) => {
+  // Get audit logs
+  app.get("/api/audit-logs", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const tenantId = 1; // Demo tenant
+      const tenantId = req.user!.tenantId;
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 50;
       
       const logs = await storage.getAuditLogs(tenantId, page, limit);
       res.json(logs);
     } catch (error) {
+      console.error("Error fetching audit logs:", error);
       res.status(500).json({ message: "Failed to fetch audit logs" });
     }
   });

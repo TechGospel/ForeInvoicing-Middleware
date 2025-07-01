@@ -19,18 +19,54 @@ import {
   Info,
   AlertTriangle,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { isUnauthorizedError } from "@/lib/authUtils";
 
 export default function AuditLogs() {
   const [page, setPage] = useState(1);
+  const { toast } = useToast();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+
+  // Redirect to home if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      toast({
+        title: "Unauthorized",
+        description: "You are logged out. Logging in again...",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 500);
+      return;
+    }
+  }, [isAuthenticated, authLoading, toast]);
 
   const {
     data: logs,
     isLoading,
     refetch,
+    error,
   } = useQuery({
     queryKey: ["/api/audit-logs", { page, limit: 50 }],
+    enabled: isAuthenticated, // Only run query when authenticated
   });
+
+  // Handle query errors, especially unauthorized
+  useEffect(() => {
+    if (error && isUnauthorizedError(error)) {
+      toast({
+        title: "Unauthorized",
+        description: "You are logged out. Logging in again...",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 500);
+    }
+  }, [error, toast]);
 
   const getLevelIcon = (level: string) => {
     switch (level) {
@@ -91,7 +127,7 @@ export default function AuditLogs() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {logs?.map((log: any) => (
+                    {logs && Array.isArray(logs) ? logs.map((log: any) => (
                       <TableRow key={log.id}>
                         <TableCell className="text-sm text-muted-foreground">
                           {new Date(log.timestamp).toLocaleString()}
@@ -119,7 +155,13 @@ export default function AuditLogs() {
                           )}
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )) : (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                          No audit logs found
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               )}
