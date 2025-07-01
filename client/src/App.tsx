@@ -17,27 +17,36 @@ import Register from "@/pages/register";
 import NotFound from "@/pages/not-found";
 
 function Router() {
-  // For demo purposes, always show the main app
-  // Authentication can be implemented later
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
-      <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden ml-64">
-        <main className="flex-1 overflow-auto">
-          <Switch>
-            <Route path="/" component={Dashboard} />
-            <Route path="/submit-invoice" component={SubmitInvoice} />
-            <Route path="/invoice-history" component={InvoiceHistory} />
-            <Route path="/audit-logs" component={AuditLogs} />
-            <Route path="/tenant-management" component={TenantManagement} />
-            <Route path="/configuration" component={Configuration} />
-            <Route path="/api-docs" component={ApiDocs} />
-            <Route path="/login" component={Login} />
-            <Route path="/register" component={Register} />
-            <Route component={NotFound} />
-          </Switch>
-        </main>
-      </div>
+    <div className="h-screen bg-gray-100 dark:bg-gray-900">
+      <Switch>
+        {/* Auth pages without sidebar */}
+        <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        
+        {/* Main app with sidebar */}
+        <Route>
+          {() => (
+            <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+              <Sidebar />
+              <div className="flex-1 flex flex-col overflow-hidden ml-64">
+                <main className="flex-1 overflow-auto">
+                  <Switch>
+                    <Route path="/" component={Dashboard} />
+                    <Route path="/submit-invoice" component={SubmitInvoice} />
+                    <Route path="/invoice-history" component={InvoiceHistory} />
+                    <Route path="/audit-logs" component={AuditLogs} />
+                    <Route path="/tenant-management" component={TenantManagement} />
+                    <Route path="/configuration" component={Configuration} />
+                    <Route path="/api-docs" component={ApiDocs} />
+                    <Route component={NotFound} />
+                  </Switch>
+                </main>
+              </div>
+            </div>
+          )}
+        </Route>
+      </Switch>
     </div>
   );
 }
