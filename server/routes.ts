@@ -8,6 +8,7 @@ import { authMiddleware } from "./middleware/auth";
 import { InvoiceValidator } from "./services/invoice-validator";
 import { FirsAdapter } from "./services/firs-adapter";
 import { AuditLogger } from "./services/audit-logger";
+import { AuthService } from "./services/auth";
 import multer from "multer";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -104,7 +105,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
     } catch (error) {
-      res.status(500).json({ message: "Registration failed" });
+      console.error("Registration error:", error);
+      res.status(500).json({ message: "Registration failed", error: error.message });
     }
   });
 
