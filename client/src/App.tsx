@@ -34,17 +34,14 @@ function Router() {
         {/* Auth pages without sidebar */}
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
-        
+
         {/* Main app with sidebar */}
         <Route>
           {() => (
             <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
-              <Sidebar 
-                isOpen={sidebarOpen} 
-                onClose={handleCloseSidebar}
-              />
-              <div className="flex-1 flex flex-col overflow-hidden lg:ml-64">
-                <MobileHeader 
+              <Sidebar isOpen={sidebarOpen} onClose={handleCloseSidebar} />
+              <div className="flex-1 flex flex-col overflow-hidden ">
+                <MobileHeader
                   onMenuClick={handleOpenSidebar}
                   title="FIRS MBS API"
                   subtitle="Invoice Processing System"
@@ -55,7 +52,10 @@ function Router() {
                     <Route path="/submit-invoice" component={SubmitInvoice} />
                     <Route path="/invoice-history" component={InvoiceHistory} />
                     <Route path="/audit-logs" component={AuditLogs} />
-                    <Route path="/tenant-management" component={TenantManagement} />
+                    <Route
+                      path="/tenant-management"
+                      component={TenantManagement}
+                    />
                     <Route path="/configuration" component={Configuration} />
                     <Route path="/api-docs" component={ApiDocs} />
                     <Route component={NotFound} />
