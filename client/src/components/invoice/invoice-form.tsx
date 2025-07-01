@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { FileUpload } from "./file-upload";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Send, Loader2 } from "lucide-react";
@@ -25,6 +25,11 @@ export function InvoiceForm() {
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Fetch tenants for dropdown
+  const { data: tenants, isLoading: tenantsLoading } = useQuery({
+    queryKey: ["/api/tenants"],
+  });
 
   const submitMutation = useMutation({
     mutationFn: async (data: FormData) => {
@@ -93,15 +98,22 @@ export function InvoiceForm() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="tenant">Tenant ID</Label>
+                <Label htmlFor="tenant">Tenant</Label>
                 <Select value={formData.tenantId} onValueChange={(value) => setFormData({...formData, tenantId: value})}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select tenant..." />
+                    <SelectValue placeholder={tenantsLoading ? "Loading tenants..." : "Select tenant..."} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="tenant_1">Acme Corp Ltd (TIN: 12345678-001)</SelectItem>
-                    <SelectItem value="tenant_2">TechStart Nigeria (TIN: 87654321-002)</SelectItem>
-                    <SelectItem value="tenant_3">Global Imports Ltd (TIN: 11223344-003)</SelectItem>
+                    {tenants && Array.isArray(tenants) && tenants.map((tenant: any) => (
+                      <SelectItem key={tenant.id} value={tenant.id.toString()}>
+                        {tenant.name} (TIN: {tenant.tin})
+                      </SelectItem>
+                    ))}
+                    {!tenantsLoading && (!tenants || !Array.isArray(tenants) || tenants.length === 0) && (
+                      <SelectItem value="no-tenants" disabled>
+                        No tenants available
+                      </SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
