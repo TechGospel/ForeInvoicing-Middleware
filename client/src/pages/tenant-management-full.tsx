@@ -15,6 +15,7 @@ import { z } from "zod";
 import { Plus, Users, Settings, Trash2, Edit, Key, MoreHorizontal } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 // Schema for tenant creation
 const tenantSchema = z.object({
@@ -66,11 +67,35 @@ interface User {
 export default function TenantManagementFull() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user, isLoading: authLoading } = useAuth();
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
   const [showCreateTenant, setShowCreateTenant] = useState(false);
   const [showCreateUser, setShowCreateUser] = useState(false);
   const [showEditUser, setShowEditUser] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+
+  // Check if user has permission to access tenant management
+  if (authLoading) {
+    return <div className="p-4 sm:p-6">Loading...</div>;
+  }
+
+  if (!user || user.role !== "admin") {
+    return (
+      <div className="p-4 sm:p-6">
+        <div className="text-center py-8">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            Access Denied
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            You don't have permission to access tenant management. Only administrators can manage tenants and users.
+          </p>
+          <Button onClick={() => window.history.back()}>
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   // Fetch tenants
   const { data: tenants = [], isLoading: tenantsLoading } = useQuery({

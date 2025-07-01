@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { DollarSign, BarChart3, Send, FileText, Users, Settings, Book, ClipboardList, LogOut, Menu, X } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
@@ -22,6 +23,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen = true, onClose, className }: SidebarProps) {
   const [location] = useLocation();
+  const { user } = useAuth();
   
   const handleLogout = () => {
     localStorage.removeItem("authToken");
@@ -34,6 +36,15 @@ export function Sidebar({ isOpen = true, onClose, className }: SidebarProps) {
       onClose();
     }
   };
+
+  // Filter navigation items based on user role
+  const filteredNavigation = navigation.filter((item) => {
+    // Hide tenant management for users with "user" role
+    if (item.href === "/tenant-management-full" && user?.role === "user") {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <>
@@ -75,7 +86,7 @@ export function Sidebar({ isOpen = true, onClose, className }: SidebarProps) {
         </div>
         
         <nav className="p-4 space-y-2 flex-1">
-          {navigation.map((item) => {
+          {filteredNavigation.map((item) => {
             const Icon = item.icon;
             const isActive = location === item.href;
             

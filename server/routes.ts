@@ -32,6 +32,24 @@ const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // Authentication endpoints
+  
+  // Get current authenticated user
+  app.get("/api/auth/user", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const user = await storage.getUser(req.user!.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Remove password from response
+      const { password, ...safeUser } = user;
+      res.json(safeUser);
+    } catch (error) {
+      console.error("Error fetching current user:", error);
+      res.status(500).json({ error: "Failed to fetch user" });
+    }
+  });
+
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { username, password } = req.body;
