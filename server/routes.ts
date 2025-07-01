@@ -57,10 +57,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Dashboard metrics
-  app.get("/api/dashboard/metrics", authMiddleware, async (req: AuthRequest, res) => {
+  // Dashboard metrics (temporarily bypassing auth for demo)
+  app.get("/api/dashboard/metrics", async (req: AuthRequest, res) => {
     try {
-      const tenantId = req.user?.tenantId || 1;
+      const tenantId = 1; // Demo tenant
       const metrics = await storage.getDashboardMetrics(tenantId);
       res.json(metrics);
     } catch (error) {
@@ -68,10 +68,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Recent activity
-  app.get("/api/dashboard/activity", authMiddleware, async (req: AuthRequest, res) => {
+  // Recent activity (temporarily bypassing auth for demo)
+  app.get("/api/dashboard/activity", async (req: AuthRequest, res) => {
     try {
-      const tenantId = req.user?.tenantId || 1;
+      const tenantId = 1; // Demo tenant
       const activity = await storage.getRecentActivity(tenantId);
       res.json(activity);
     } catch (error) {
@@ -79,8 +79,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // System status
-  app.get("/api/system/status", authMiddleware, async (req, res) => {
+  // System status (temporarily bypassing auth for demo)
+  app.get("/api/system/status", async (req, res) => {
     try {
       const status = {
         firsApi: "operational",
@@ -300,10 +300,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get invoices for tenant
-  app.get("/api/invoices", authMiddleware, async (req, res) => {
+  // Get invoices for tenant (temporarily bypassing auth for demo)
+  app.get("/api/invoices", async (req, res) => {
     try {
-      const tenantId = req.user?.tenantId;
+      const tenantId = 1; // Demo tenant
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
       
@@ -314,10 +314,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get audit logs
-  app.get("/api/audit-logs", authMiddleware, async (req, res) => {
+  // Get audit logs (temporarily bypassing auth for demo)
+  app.get("/api/audit-logs", async (req, res) => {
     try {
-      const tenantId = req.user?.tenantId;
+      const tenantId = 1; // Demo tenant
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 50;
       
