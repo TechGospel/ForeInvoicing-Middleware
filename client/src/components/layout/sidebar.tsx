@@ -2,7 +2,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { DollarSign, BarChart3, Send, FileText, Users, Settings, Book, ClipboardList, LogOut } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { useAuthContext } from "@/lib/auth";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
@@ -16,7 +15,11 @@ const navigation = [
 
 export function Sidebar() {
   const [location] = useLocation();
-  const { logout } = useAuthContext();
+  
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    window.location.href = "/login";
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 w-64 shadow-sm border-r border-gray-200 dark:border-gray-700 fixed h-full flex flex-col">
@@ -58,7 +61,7 @@ export function Sidebar() {
         <Button
           variant="ghost"
           className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
-          onClick={logout}
+          onClick={handleLogout}
         >
           <LogOut className="mr-3 h-5 w-5" />
           Logout

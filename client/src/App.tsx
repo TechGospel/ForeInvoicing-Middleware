@@ -3,7 +3,6 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider, useAuthContext } from "@/lib/auth";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import Dashboard from "@/pages/dashboard";
@@ -18,21 +17,8 @@ import Register from "@/pages/register";
 import NotFound from "@/pages/not-found";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuthContext();
-
-  // Show login/register pages for unauthenticated users
-  if (!isAuthenticated && !isLoading) {
-    return (
-      <Switch>
-        <Route path="/register" component={Register} />
-        <Route path="/login" component={Login} />
-        <Route path="/" component={Login} />
-        <Route component={Login} />
-      </Switch>
-    );
-  }
-
-  // Show main app for authenticated users
+  // For demo purposes, always show the main app
+  // Authentication can be implemented later
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
       <Sidebar />
@@ -47,6 +33,8 @@ function Router() {
             <Route path="/tenant-management" component={TenantManagement} />
             <Route path="/configuration" component={Configuration} />
             <Route path="/api-docs" component={ApiDocs} />
+            <Route path="/login" component={Login} />
+            <Route path="/register" component={Register} />
             <Route component={NotFound} />
           </Switch>
         </main>
@@ -58,12 +46,10 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Router />
+      </TooltipProvider>
     </QueryClientProvider>
   );
 }

@@ -20,7 +20,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const auth = useAuth();
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
+    const token = localStorage.getItem("authToken");
     if (token) {
       // Set default authorization header
       const originalFetch = window.fetch;

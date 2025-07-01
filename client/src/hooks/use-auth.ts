@@ -22,19 +22,20 @@ export function useAuth() {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      const response = await apiRequest("POST", "/api/auth/login", credentials);
-      return response.json();
+      const response = await apiRequest("/api/auth/login", "POST", credentials);
+      return response;
     },
     onSuccess: (data) => {
-      localStorage.setItem("auth_token", data.token);
+      localStorage.setItem("authToken", data.token);
       queryClient.setQueryData(["/api/auth/me"], data.user);
       queryClient.invalidateQueries();
     },
   });
 
   const logout = () => {
-    localStorage.removeItem("auth_token");
+    localStorage.removeItem("authToken");
     queryClient.clear();
+    window.location.href = "/login";
   };
 
   return {
