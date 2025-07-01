@@ -103,7 +103,7 @@ export default function Configuration() {
   // Test FIRS connection mutation
   const testConnectionMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/configuration/test-firs", "POST", {});
+      return await apiRequest("POST", "/api/configuration/test-firs", {});
     },
     onSuccess: (data: any) => {
       toast({
@@ -123,7 +123,7 @@ export default function Configuration() {
   // Reset to defaults mutation
   const resetConfigMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/configuration/reset", "POST", {});
+      return await apiRequest("POST", "/api/configuration/reset", {});
     },
     onSuccess: () => {
       toast({

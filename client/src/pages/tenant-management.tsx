@@ -139,7 +139,7 @@ export default function TenantManagement() {
   // Create user mutation
   const createUserMutation = useMutation({
     mutationFn: async (data: UserForm & { tenantId: number }) => {
-      return await apiRequest("/api/users", "POST", data);
+      return await apiRequest("POST", "/api/users", data);
     },
     onSuccess: () => {
       toast({
@@ -162,7 +162,7 @@ export default function TenantManagement() {
   // Regenerate API key mutation
   const regenerateApiKeyMutation = useMutation({
     mutationFn: async (tenantId: number) => {
-      return await apiRequest(`/api/tenants/${tenantId}/regenerate-key`, "POST", {});
+      return await apiRequest("POST", `/api/tenants/${tenantId}/regenerate-key`, {});
     },
     onSuccess: () => {
       toast({
