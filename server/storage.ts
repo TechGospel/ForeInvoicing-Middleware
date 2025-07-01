@@ -21,11 +21,17 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, updates: Partial<User>): Promise<User>;
+  deleteUser(id: number): Promise<void>;
+  getUsersByTenant(tenantId: number): Promise<User[]>;
   
   // Tenant methods
   getTenant(id: number): Promise<Tenant | undefined>;
   getTenantByApiKey(apiKey: string): Promise<Tenant | undefined>;
   createTenant(tenant: InsertTenant): Promise<Tenant>;
+  updateTenant(id: number, updates: Partial<Tenant>): Promise<Tenant>;
+  deleteTenant(id: number): Promise<void>;
+  getAllTenants(): Promise<Tenant[]>;
   
   // Invoice methods
   getInvoice(id: number): Promise<Invoice | undefined>;
@@ -61,6 +67,26 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async updateUser(id: number, updates: Partial<User>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
+  }
+
+  async getUsersByTenant(tenantId: number): Promise<User[]> {
+    return await db
+      .select()
+      .from(users)
+      .where(eq(users.tenantId, tenantId));
+  }
+
   async getTenant(id: number): Promise<Tenant | undefined> {
     const [tenant] = await db.select().from(tenants).where(eq(tenants.id, id));
     return tenant || undefined;
@@ -77,6 +103,23 @@ export class DatabaseStorage implements IStorage {
       .values(insertTenant)
       .returning();
     return tenant;
+  }
+
+  async updateTenant(id: number, updates: Partial<Tenant>): Promise<Tenant> {
+    const [tenant] = await db
+      .update(tenants)
+      .set(updates)
+      .where(eq(tenants.id, id))
+      .returning();
+    return tenant;
+  }
+
+  async deleteTenant(id: number): Promise<void> {
+    await db.delete(tenants).where(eq(tenants.id, id));
+  }
+
+  async getAllTenants(): Promise<Tenant[]> {
+    return await db.select().from(tenants);
   }
 
   async getInvoice(id: number): Promise<Invoice | undefined> {

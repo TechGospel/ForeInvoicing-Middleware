@@ -11,6 +11,7 @@ import SubmitInvoice from "@/pages/submit-invoice";
 import InvoiceHistory from "@/pages/invoice-history";
 import AuditLogs from "@/pages/audit-logs";
 import TenantManagement from "@/pages/tenant-management-simple";
+import TenantManagementFull from "@/pages/tenant-management-full";
 import Configuration from "@/pages/configuration";
 import ApiDocs from "@/pages/api-docs";
 import Login from "@/pages/login";
@@ -55,6 +56,10 @@ function Router() {
                     <Route
                       path="/tenant-management"
                       component={TenantManagement}
+                    />
+                    <Route
+                      path="/tenant-management-full"
+                      component={TenantManagementFull}
                     />
                     <Route path="/configuration" component={Configuration} />
                     <Route path="/api-docs" component={ApiDocs} />

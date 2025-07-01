@@ -3,7 +3,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
-import { insertInvoiceSchema, insertAuditLogSchema } from "@shared/schema";
+import { insertInvoiceSchema, insertAuditLogSchema, insertTenantSchema, insertUserSchema } from "@shared/schema";
 import { authMiddleware } from "./middleware/auth";
 import { InvoiceValidator } from "./services/invoice-validator";
 import { FirsAdapter } from "./services/firs-adapter";
@@ -382,74 +382,198 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Tenant management endpoints
-  app.get("/api/tenants", async (req, res) => {
+  app.get("/api/tenants", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      // For demo, return all tenants
-      const tenants = await db.select().from(require('../shared/schema').tenants);
+      const tenants = await storage.getAllTenants();
       res.json(tenants);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch tenants" });
+      console.error("Error fetching tenants:", error);
+      res.status(500).json({ error: "Failed to fetch tenants" });
     }
   });
 
-  app.put("/api/tenants/:id", async (req, res) => {
+  app.post("/api/tenants", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const { id } = req.params;
+      const tenantData = insertTenantSchema.parse(req.body);
+      
+      // Generate API key for the new tenant
+      const apiKey = AuthService.generateApiKey();
+      
+      const tenant = await storage.createTenant({
+        ...tenantData,
+        apiKey
+      });
+      
+      await auditLogger.logUserAction(
+        req.user!.userId,
+        req.user!.tenantId,
+        "create_tenant",
+        { tenantId: tenant.id, tenantName: tenant.name }
+      );
+      
+      res.status(201).json(tenant);
+    } catch (error) {
+      console.error("Error creating tenant:", error);
+      res.status(500).json({ error: "Failed to create tenant" });
+    }
+  });
+
+  app.put("/api/tenants/:id", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const tenantId = parseInt(req.params.id);
       const updates = req.body;
       
-      await db.update(require('../shared/schema').tenants)
-        .set({ ...updates, updatedAt: new Date() })
-        .where(require('drizzle-orm').eq(require('../shared/schema').tenants.id, parseInt(id)));
+      const tenant = await storage.updateTenant(tenantId, updates);
       
-      res.json({ message: "Tenant updated successfully" });
+      await auditLogger.logUserAction(
+        req.user!.userId,
+        req.user!.tenantId,
+        "update_tenant",
+        { tenantId, updates }
+      );
+      
+      res.json(tenant);
     } catch (error) {
-      res.status(500).json({ message: "Failed to update tenant" });
+      console.error("Error updating tenant:", error);
+      res.status(500).json({ error: "Failed to update tenant" });
     }
   });
 
-  app.post("/api/tenants/:id/regenerate-key", async (req, res) => {
+  app.delete("/api/tenants/:id", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const { id } = req.params;
+      const tenantId = parseInt(req.params.id);
+      
+      await storage.deleteTenant(tenantId);
+      
+      await auditLogger.logUserAction(
+        req.user!.userId,
+        req.user!.tenantId,
+        "delete_tenant",
+        { tenantId }
+      );
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting tenant:", error);
+      res.status(500).json({ error: "Failed to delete tenant" });
+    }
+  });
+
+  app.post("/api/tenants/:id/regenerate-key", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const tenantId = parseInt(req.params.id);
       const newApiKey = AuthService.generateApiKey();
       
-      await db.update(require('../shared/schema').tenants)
-        .set({ apiKey: newApiKey, updatedAt: new Date() })
-        .where(require('drizzle-orm').eq(require('../shared/schema').tenants.id, parseInt(id)));
+      const tenant = await storage.updateTenant(tenantId, { apiKey: newApiKey });
       
-      res.json({ message: "API key regenerated successfully" });
+      await auditLogger.logUserAction(
+        req.user!.userId,
+        req.user!.tenantId,
+        "regenerate_api_key",
+        { tenantId }
+      );
+      
+      res.json({ message: "API key regenerated successfully", apiKey: newApiKey });
     } catch (error) {
-      res.status(500).json({ message: "Failed to regenerate API key" });
+      console.error("Error regenerating API key:", error);
+      res.status(500).json({ error: "Failed to regenerate API key" });
     }
   });
 
-  app.get("/api/tenants/:id/users", async (req, res) => {
+  // User management endpoints
+  app.get("/api/tenants/:id/users", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const { id } = req.params;
-      const users = await db.select()
-        .from(require('../shared/schema').users)
-        .where(require('drizzle-orm').eq(require('../shared/schema').users.tenantId, parseInt(id)));
+      const tenantId = parseInt(req.params.id);
+      const users = await storage.getUsersByTenant(tenantId);
       
-      res.json(users);
+      // Remove password from response
+      const safeUsers = users.map(user => {
+        const { password, ...safeUser } = user;
+        return safeUser;
+      });
+      
+      res.json(safeUsers);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch users" });
+      console.error("Error fetching users:", error);
+      res.status(500).json({ error: "Failed to fetch users" });
     }
   });
 
-  app.post("/api/users", async (req, res) => {
+  app.post("/api/tenants/:id/users", authMiddleware, async (req: AuthRequest, res) => {
     try {
-      const userData = req.body;
+      const tenantId = parseInt(req.params.id);
+      const userData = insertUserSchema.parse(req.body);
+      
+      // Hash password
       const hashedPassword = await AuthService.hashPassword(userData.password);
       
-      const [user] = await db.insert(require('../shared/schema').users)
-        .values({
-          ...userData,
-          password: hashedPassword
-        })
-        .returning();
+      const user = await storage.createUser({
+        ...userData,
+        tenantId,
+        password: hashedPassword
+      });
       
-      res.status(201).json(user);
+      await auditLogger.logUserAction(
+        req.user!.userId,
+        req.user!.tenantId,
+        "create_user",
+        { userId: user.id, username: user.username, tenantId }
+      );
+      
+      // Remove password from response
+      const { password, ...safeUser } = user;
+      res.status(201).json(safeUser);
     } catch (error) {
-      res.status(500).json({ message: "Failed to create user" });
+      console.error("Error creating user:", error);
+      res.status(500).json({ error: "Failed to create user" });
+    }
+  });
+
+  app.put("/api/users/:id", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const updates = req.body;
+      
+      // Hash password if it's being updated
+      if (updates.password) {
+        updates.password = await AuthService.hashPassword(updates.password);
+      }
+      
+      const user = await storage.updateUser(userId, updates);
+      
+      await auditLogger.logUserAction(
+        req.user!.userId,
+        req.user!.tenantId,
+        "update_user",
+        { userId, updates: Object.keys(updates) }
+      );
+      
+      // Remove password from response
+      const { password, ...safeUser } = user;
+      res.json(safeUser);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ error: "Failed to update user" });
+    }
+  });
+
+  app.delete("/api/users/:id", authMiddleware, async (req: AuthRequest, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      
+      await storage.deleteUser(userId);
+      
+      await auditLogger.logUserAction(
+        req.user!.userId,
+        req.user!.tenantId,
+        "delete_user",
+        { userId }
+      );
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ error: "Failed to delete user" });
     }
   });
 

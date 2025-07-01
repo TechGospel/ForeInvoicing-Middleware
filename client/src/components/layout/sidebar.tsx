@@ -8,7 +8,7 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: BarChart3 },
   { name: "Submit Invoice", href: "/submit-invoice", icon: Send },
   { name: "Invoice History", href: "/invoice-history", icon: FileText },
-  { name: "Tenant Management", href: "/tenant-management", icon: Users },
+  { name: "Tenant Management", href: "/tenant-management-full", icon: Users },
   { name: "Configuration", href: "/configuration", icon: Settings },
   { name: "API Documentation", href: "/api-docs", icon: Book },
   { name: "Audit Logs", href: "/audit-logs", icon: ClipboardList },
