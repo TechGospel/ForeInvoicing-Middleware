@@ -111,6 +111,29 @@ The system uses a multi-tenant PostgreSQL database with the following core entit
 - **Multi-tenant Architecture**: Tenant isolation supports scaling to multiple organizations
 - **Async Processing**: Built-in support for background invoice processing
 
+# Local Development Setup
+
+## Quick Start Guide
+1. **Prerequisites**: Node.js v20+, npm, PostgreSQL (optional - Neon is configured)
+2. **Install**: `npm install`
+3. **Environment**: Copy `.env.example` to `.env` and configure your database URL
+4. **Database**: Run `npm run db:push` to set up the schema
+5. **Start**: `npm run dev` - Application runs on http://localhost:5000
+
+## Development Tools
+- **Setup Script**: `./setup-local.sh` - Automated local environment setup
+- **Environment Check**: `node check-env.js` - Validates configuration
+- **Hot Reload**: Both frontend and backend support hot reloading
+- **Default Admin**: Username: `admin`, Password: `admin123`
+
+## Key Commands
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run check` - TypeScript type checking
+- `npm run db:push` - Push database schema changes
+
+For detailed setup instructions, see `LOCAL-SETUP.md`
+
 # Changelog
 
 ```
@@ -118,6 +141,7 @@ Changelog:
 - July 01, 2025. Initial setup
 - July 01, 2025. Added bulk invoice submission feature with individual processing
 - July 01, 2025. Implemented comprehensive Docker containerization with production-grade security
+- July 01, 2025. Added comprehensive local development setup with automated scripts
 ```
 
 # User Preferences
