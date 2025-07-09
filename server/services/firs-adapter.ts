@@ -1,16 +1,19 @@
+import { type FirsInvoice } from '@shared/firs-schema';
+
 interface FirsResponse {
   irn: string;
   qrCode: string;
   status: string;
   message?: string;
+  validationReport?: {
+    isValid: boolean;
+    errors: string[];
+    warnings: string[];
+  };
 }
 
-interface FirsSubmissionData {
-  supplier: any;
-  buyer: any;
-  invoiceNumber: string;
-  total: any;
-  lineItems: any[];
+interface FirsSubmissionData extends FirsInvoice {
+  // FIRS submission data is now fully compliant with UBL standards
 }
 
 export class FirsAdapter {

@@ -5,8 +5,8 @@ import { storage } from "./storage";
 import { z } from "zod";
 import { insertInvoiceSchema, insertAuditLogSchema, insertTenantSchema, insertUserSchema } from "@shared/schema";
 import { authMiddleware } from "./middleware/auth";
-import { InvoiceValidator } from "./services/invoice-validator";
-import { FirsAdapter } from "./services/firs-adapter";
+import { FirsInvoiceValidator } from "./services/firs-validator";
+import { FirsAdapter } from "./services/firs-adapter-v2";
 import { AuditLogger } from "./services/audit-logger";
 import { AuthService } from "./services/auth";
 import multer from "multer";
@@ -22,7 +22,7 @@ interface AuthRequest extends Request {
 }
 
 const upload = multer({ dest: 'uploads/' });
-const invoiceValidator = new InvoiceValidator();
+const firsValidator = new FirsInvoiceValidator();
 const firsAdapter = new FirsAdapter();
 const auditLogger = new AuditLogger(storage);
 
@@ -264,8 +264,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         metadata: { format, priority: req.body.priority || "normal" }
       });
 
-      // Validate invoice
-      const validationResult = await invoiceValidator.validate(invoiceData, format);
+      // Validate invoice using FIRS-compliant validator
+      const validationResult = await firsValidator.validateFirsCompliant(invoiceData, format);
       
       if (!validationResult.isValid) {
         await auditLogger.log({
@@ -273,24 +273,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
           userId,
           action: "validate",
           level: "error",
-          message: "Invoice validation failed",
-          metadata: { errors: validationResult.errors }
+          message: "FIRS invoice validation failed",
+          metadata: { 
+            errors: validationResult.errors,
+            warnings: validationResult.warnings,
+            fieldErrors: validationResult.validationDetails?.fieldErrors 
+          }
         });
 
         return res.status(400).json({
           message: "Invoice validation failed",
-          errors: validationResult.errors
+          errors: validationResult.errors,
+          warnings: validationResult.warnings,
+          validationDetails: validationResult.validationDetails
         });
       }
 
-      // Normalize to UBL 3.0 format
-      const normalizedData = await invoiceValidator.normalize(invoiceData, format);
+      // Use the FIRS-compliant normalized data
+      const normalizedData = validationResult.normalizedData!;
 
-      // Extract invoice details
-      const supplierTin = normalizedData.supplier?.tin || "";
-      const buyerTin = normalizedData.buyer?.tin || "";
-      const totalAmount = normalizedData.total?.amount || "0";
-      const invoiceNumber = normalizedData.invoiceNumber || `INV-${Date.now()}`;
+      // Extract invoice details from FIRS-compliant data
+      const supplierTin = normalizedData.accounting_supplier_party?.tin || "";
+      const buyerTin = normalizedData.accounting_customer_party?.tin || "";
+      const totalAmount = normalizedData.legal_monetary_total?.payable_amount?.toString() || "0";
+      const invoiceNumber = normalizedData.irn || `INV-${Date.now()}`;
 
       // Create invoice record
       const invoice = await storage.createInvoice({

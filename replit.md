@@ -43,14 +43,18 @@ The system uses a multi-tenant PostgreSQL database with the following core entit
 - **JWT Token Management**: Secure token-based authentication with 24-hour expiration
 
 ## Validation Engine
-- **Field Validation**: Nigerian TIN format validation, tax calculation verification
-- **Schema Compliance**: BIS UBL 3.0 XML schema validation
-- **Custom Rules**: Tenant-specific validation rules stored in database configuration
+- **FIRS Compliance**: Full implementation of official FIRS UBL 3.0 schema standards
+- **Three-Layer Validation**: Schema validation, business rules, and FIRS compliance checks
+- **Field Validation**: Nigerian TIN format validation (########-####), tax calculation verification
+- **Format Support**: Native FIRS JSON, legacy JSON, and UBL 3.0 XML with auto-conversion
+- **Detailed Error Reporting**: Field-specific errors, business rule violations, and compliance issues
 
 ## External Service Integration
-- **FIRS MBS API**: Primary integration point for invoice submission
-- **Retry Mechanism**: Exponential backoff for failed submissions
+- **FIRS MBS API**: Official integration with https://einvoice.firs.gov.ng/api/v1/invoice/validate
+- **UBL 3.0 Standards**: Full Universal Business Language compliance
+- **Retry Mechanism**: Exponential backoff for failed submissions with 30-second timeout
 - **Response Handling**: IRN (Invoice Reference Number) and QR code processing
+- **Authentication**: Bearer token-based API authentication
 
 # Data Flow
 
@@ -142,6 +146,7 @@ Changelog:
 - July 01, 2025. Added bulk invoice submission feature with individual processing
 - July 01, 2025. Implemented comprehensive Docker containerization with production-grade security
 - July 01, 2025. Added comprehensive local development setup with automated scripts
+- July 01, 2025. Implemented full FIRS UBL 3.0 compliance with official schema validation
 ```
 
 # User Preferences
