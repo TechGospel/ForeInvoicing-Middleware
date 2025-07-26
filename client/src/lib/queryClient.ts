@@ -15,7 +15,10 @@ export async function apiRequest(
   const token = localStorage.getItem("authToken");
   const headers: Record<string, string> = {};
   
-  if (data) {
+  // Check if data is FormData (for file uploads)
+  const isFormData = data instanceof FormData;
+  
+  if (data && !isFormData) {
     headers["Content-Type"] = "application/json";
   }
   
@@ -26,7 +29,7 @@ export async function apiRequest(
   const res = await fetch(url, {
     method,
     headers,
-    body: data ? JSON.stringify(data) : undefined,
+    body: isFormData ? data : (data ? JSON.stringify(data) : undefined),
     credentials: "include",
   });
 

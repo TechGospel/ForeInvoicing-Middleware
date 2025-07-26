@@ -136,7 +136,7 @@ export function InvoiceForm() {
                   <SelectContent>
                     {tenants && Array.isArray(tenants) && tenants.map((tenant: any) => (
                       <SelectItem key={tenant.id} value={tenant.id.toString()}>
-                        {tenant.name} (TIN: {tenant.tin})
+                        {String(tenant.name)} (TIN: {String(tenant.tin)})
                       </SelectItem>
                     ))}
                     {!tenantsLoading && (!tenants || !Array.isArray(tenants) || tenants.length === 0) && (
