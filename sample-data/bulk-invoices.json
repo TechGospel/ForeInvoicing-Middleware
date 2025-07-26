@@ -1,0 +1,220 @@
+{
+  "batch_id": "BATCH-20240726-001",
+  "invoices": [
+    {
+      "business_id": "test-business-001",
+      "irn": "INV20240726-B001",
+      "issue_date": "2024-07-26",
+      "due_date": "2024-08-25",
+      "invoice_type_code": "380",
+      "document_currency_code": "NGN",
+      "tax_currency_code": "NGN",
+      "note": "Retail sale - Electronics",
+      "accounting_supplier_party": {
+        "party_name": "ElectroMart Nigeria Ltd",
+        "tin": "11111111-2222",
+        "email": "sales@electromart.ng",
+        "phone": "+234-805-111-2222",
+        "postal_address": {
+          "street_name": "45 Computer Village Road",
+          "city_name": "Lagos",
+          "postal_zone": "100001",
+          "country_subdivision": "Lagos State",
+          "country": "NG"
+        }
+      },
+      "accounting_customer_party": {
+        "party_name": "John Doe",
+        "email": "john.doe@email.com",
+        "phone": "+234-803-555-1234"
+      },
+      "invoice_line": [
+        {
+          "id": "1",
+          "invoiced_quantity": 1,
+          "unit_code": "EA",
+          "line_extension_amount": 150000,
+          "item": {
+            "description": "Samsung Galaxy Smartphone",
+            "name": "Galaxy A54 5G",
+            "sellers_item_identification": {
+              "id": "PHONE-SAM-A54"
+            },
+            "classified_tax_category": {
+              "id": "VAT",
+              "percent": 7.5
+            }
+          },
+          "price": {
+            "price_amount": 150000
+          }
+        }
+      ],
+      "tax_total": [
+        {
+          "tax_amount": 11250,
+          "tax_subtotal": [
+            {
+              "taxable_amount": 150000,
+              "tax_amount": 11250,
+              "tax_category": {
+                "id": "VAT",
+                "percent": 7.5
+              }
+            }
+          ]
+        }
+      ],
+      "legal_monetary_total": {
+        "line_extension_amount": 150000,
+        "tax_exclusive_amount": 150000,
+        "tax_inclusive_amount": 161250,
+        "payable_amount": 161250
+      }
+    },
+    {
+      "business_id": "test-business-002",
+      "irn": "INV20240726-B002",
+      "issue_date": "2024-07-26",
+      "due_date": "2024-08-25",
+      "invoice_type_code": "380",
+      "document_currency_code": "NGN",
+      "tax_currency_code": "NGN",
+      "note": "Consulting services invoice",
+      "accounting_supplier_party": {
+        "party_name": "Professional Consultants Ltd",
+        "tin": "33333333-4444",
+        "email": "billing@proconsult.ng",
+        "phone": "+234-701-333-4444",
+        "postal_address": {
+          "street_name": "78 Broad Street",
+          "city_name": "Lagos",
+          "postal_zone": "100001",
+          "country_subdivision": "Lagos State",
+          "country": "NG"
+        }
+      },
+      "accounting_customer_party": {
+        "party_name": "Corporate Solutions Inc",
+        "tin": "55555555-6666",
+        "email": "finance@corpsolutions.com",
+        "postal_address": {
+          "street_name": "23 Business District",
+          "city_name": "Abuja",
+          "country": "NG"
+        }
+      },
+      "invoice_line": [
+        {
+          "id": "1",
+          "invoiced_quantity": 40,
+          "unit_code": "HUR",
+          "line_extension_amount": 800000,
+          "item": {
+            "description": "Management consulting services",
+            "name": "Strategic Planning Consultation",
+            "classified_tax_category": {
+              "id": "VAT",
+              "percent": 7.5
+            }
+          },
+          "price": {
+            "price_amount": 20000
+          }
+        }
+      ],
+      "tax_total": [
+        {
+          "tax_amount": 60000,
+          "tax_subtotal": [
+            {
+              "taxable_amount": 800000,
+              "tax_amount": 60000,
+              "tax_category": {
+                "id": "VAT",
+                "percent": 7.5
+              }
+            }
+          ]
+        }
+      ],
+      "legal_monetary_total": {
+        "line_extension_amount": 800000,
+        "tax_exclusive_amount": 800000,
+        "tax_inclusive_amount": 860000,
+        "payable_amount": 860000
+      }
+    },
+    {
+      "business_id": "test-business-003",
+      "irn": "INV20240726-B003",
+      "issue_date": "2024-07-26",
+      "due_date": "2024-08-10",
+      "invoice_type_code": "381",
+      "document_currency_code": "NGN",
+      "tax_currency_code": "NGN",
+      "note": "Credit note for returned goods",
+      "accounting_supplier_party": {
+        "party_name": "Fashion Hub Nigeria",
+        "tin": "77777777-8888",
+        "email": "returns@fashionhub.ng",
+        "phone": "+234-806-777-8888",
+        "postal_address": {
+          "street_name": "12 Fashion Street",
+          "city_name": "Lagos",
+          "postal_zone": "100271",
+          "country_subdivision": "Lagos State",
+          "country": "NG"
+        }
+      },
+      "accounting_customer_party": {
+        "party_name": "Mary Johnson",
+        "email": "mary.johnson@email.com",
+        "phone": "+234-802-999-0000"
+      },
+      "invoice_line": [
+        {
+          "id": "1",
+          "invoiced_quantity": -2,
+          "unit_code": "EA",
+          "line_extension_amount": -75000,
+          "item": {
+            "description": "Designer dress - returned due to size issues",
+            "name": "Evening Dress Collection",
+            "sellers_item_identification": {
+              "id": "DRESS-EVE-001"
+            },
+            "classified_tax_category": {
+              "id": "VAT",
+              "percent": 7.5
+            }
+          },
+          "price": {
+            "price_amount": 37500
+          }
+        }
+      ],
+      "tax_total": [
+        {
+          "tax_amount": -5625,
+          "tax_subtotal": [
+            {
+              "taxable_amount": -75000,
+              "tax_amount": -5625,
+              "tax_category": {
+                "id": "VAT",
+                "percent": 7.5
+              }
+            }
+          ]
+        }
+      ],
+      "legal_monetary_total": {
+        "line_extension_amount": -75000,
+        "tax_exclusive_amount": -75000,
+        "tax_inclusive_amount": -80625,
+        "payable_amount": -80625
+      }
+    }
+  ]
+}

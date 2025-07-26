@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
+         xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+         xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+  
+  <cbc:ID>INV20240726-XML001</cbc:ID>
+  <cbc:IssueDate>2024-07-26</cbc:IssueDate>
+  <cbc:DueDate>2024-08-25</cbc:DueDate>
+  <cbc:IssueTime>15:45:00</cbc:IssueTime>
+  <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
+  <cbc:DocumentCurrencyCode>NGN</cbc:DocumentCurrencyCode>
+  <cbc:TaxCurrencyCode>NGN</cbc:TaxCurrencyCode>
+  <cbc:Note>Manufacturing goods supply invoice</cbc:Note>
+  
+  <!-- Business ID for FIRS -->
+  <cbc:BusinessID>manufacturing-business-001</cbc:BusinessID>
+  
+  <!-- Supplier Party -->
+  <cac:AccountingSupplierParty>
+    <cac:Party>
+      <cac:PartyName>
+        <cbc:Name>Industrial Manufacturing Ltd</cbc:Name>
+      </cac:PartyName>
+      <cac:PostalAddress>
+        <cbc:StreetName>Industrial Estate Road 1</cbc:StreetName>
+        <cbc:AdditionalStreetName>Agbara Industrial Estate</cbc:AdditionalStreetName>
+        <cbc:CityName>Agbara</cbc:CityName>
+        <cbc:PostalZone>110001</cbc:PostalZone>
+        <cbc:CountrySubentity>Ogun State</cbc:CountrySubentity>
+        <cac:Country>
+          <cbc:IdentificationCode>NG</cbc:IdentificationCode>
+        </cac:Country>
+      </cac:PostalAddress>
+      <cac:PartyTaxScheme>
+        <cbc:CompanyID>20202020-3030</cbc:CompanyID>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+          <cbc:Name>Value Added Tax</cbc:Name>
+        </cac:TaxScheme>
+      </cac:PartyTaxScheme>
+      <cac:Contact>
+        <cbc:ElectronicMail>sales@industrialmfg.ng</cbc:ElectronicMail>
+        <cbc:Telephone>+234-807-202-3030</cbc:Telephone>
+      </cac:Contact>
+    </cac:Party>
+  </cac:AccountingSupplierParty>
+  
+  <!-- Customer Party -->
+  <cac:AccountingCustomerParty>
+    <cac:Party>
+      <cac:PartyName>
+        <cbc:Name>Construction Partners Ltd</cbc:Name>
+      </cac:PartyName>
+      <cac:PostalAddress>
+        <cbc:StreetName>25 Construction Avenue</cbc:StreetName>
+        <cbc:AdditionalStreetName>Lekki Phase 1</cbc:AdditionalStreetName>
+        <cbc:CityName>Lagos</cbc:CityName>
+        <cbc:PostalZone>105102</cbc:PostalZone>
+        <cbc:CountrySubentity>Lagos State</cbc:CountrySubentity>
+        <cac:Country>
+          <cbc:IdentificationCode>NG</cbc:IdentificationCode>
+        </cac:Country>
+      </cac:PostalAddress>
+      <cac:PartyTaxScheme>
+        <cbc:CompanyID>40404040-5050</cbc:CompanyID>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+        </cac:TaxScheme>
+      </cac:PartyTaxScheme>
+      <cac:Contact>
+        <cbc:ElectronicMail>procurement@construction.ng</cbc:ElectronicMail>
+        <cbc:Telephone>+234-708-404-5050</cbc:Telephone>
+      </cac:Contact>
+    </cac:Party>
+  </cac:AccountingCustomerParty>
+  
+  <!-- Payment Means -->
+  <cac:PaymentMeans>
+    <cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+    <cbc:PaymentID>BANK-TRANSFER-001</cbc:PaymentID>
+    <cac:PayeeFinancialAccount>
+      <cbc:ID>2034567890</cbc:ID>
+      <cbc:Name>Industrial Manufacturing Ltd</cbc:Name>
+      <cac:FinancialInstitutionBranch>
+        <cbc:ID>058</cbc:ID>
+        <cbc:Name>Guaranty Trust Bank</cbc:Name>
+      </cac:FinancialInstitutionBranch>
+    </cac:PayeeFinancialAccount>
+  </cac:PaymentMeans>
+  
+  <!-- Invoice Lines -->
+  <cac:InvoiceLine>
+    <cbc:ID>1</cbc:ID>
+    <cbc:Note>High-grade steel rods for construction</cbc:Note>
+    <cbc:InvoicedQuantity unitCode="TON">10</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="NGN">2500000</cbc:LineExtensionAmount>
+    <cac:Item>
+      <cbc:Description>Steel reinforcement bars - 16mm diameter</cbc:Description>
+      <cbc:Name>Construction Steel Rods</cbc:Name>
+      <cac:SellersItemIdentification>
+        <cbc:ID>STEEL-16MM-ROD</cbc:ID>
+      </cac:SellersItemIdentification>
+      <cac:ClassifiedTaxCategory>
+        <cbc:ID>VAT</cbc:ID>
+        <cbc:Percent>7.5</cbc:Percent>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+          <cbc:Name>Value Added Tax</cbc:Name>
+        </cac:TaxScheme>
+      </cac:ClassifiedTaxCategory>
+    </cac:Item>
+    <cac:Price>
+      <cbc:PriceAmount currencyID="NGN">250000</cbc:PriceAmount>
+      <cbc:BaseQuantity unitCode="TON">1</cbc:BaseQuantity>
+    </cac:Price>
+  </cac:InvoiceLine>
+  
+  <cac:InvoiceLine>
+    <cbc:ID>2</cbc:ID>
+    <cbc:Note>Premium cement for foundation work</cbc:Note>
+    <cbc:InvoicedQuantity unitCode="BAG">200</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="NGN">1000000</cbc:LineExtensionAmount>
+    <cac:Item>
+      <cbc:Description>Portland cement - 50kg bags</cbc:Description>
+      <cbc:Name>Premium Portland Cement</cbc:Name>
+      <cac:SellersItemIdentification>
+        <cbc:ID>CEMENT-PORTLAND-50KG</cbc:ID>
+      </cac:SellersItemIdentification>
+      <cac:ClassifiedTaxCategory>
+        <cbc:ID>VAT</cbc:ID>
+        <cbc:Percent>7.5</cbc:Percent>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+          <cbc:Name>Value Added Tax</cbc:Name>
+        </cac:TaxScheme>
+      </cac:ClassifiedTaxCategory>
+    </cac:Item>
+    <cac:Price>
+      <cbc:PriceAmount currencyID="NGN">5000</cbc:PriceAmount>
+      <cbc:BaseQuantity unitCode="BAG">1</cbc:BaseQuantity>
+    </cac:Price>
+  </cac:InvoiceLine>
+  
+  <!-- Allowances/Charges -->
+  <cac:AllowanceCharge>
+    <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+    <cbc:AllowanceChargeReason>Volume discount for large order</cbc:AllowanceChargeReason>
+    <cbc:Amount currencyID="NGN">175000</cbc:Amount>
+    <cac:TaxCategory>
+      <cbc:ID>VAT</cbc:ID>
+      <cbc:Percent>7.5</cbc:Percent>
+      <cac:TaxScheme>
+        <cbc:ID>VAT</cbc:ID>
+        <cbc:Name>Value Added Tax</cbc:Name>
+      </cac:TaxScheme>
+    </cac:TaxCategory>
+  </cac:AllowanceCharge>
+  
+  <!-- Tax Total -->
+  <cac:TaxTotal>
+    <cbc:TaxAmount currencyID="NGN">249375</cbc:TaxAmount>
+    <cac:TaxSubtotal>
+      <cbc:TaxableAmount currencyID="NGN">3325000</cbc:TaxableAmount>
+      <cbc:TaxAmount currencyID="NGN">249375</cbc:TaxAmount>
+      <cac:TaxCategory>
+        <cbc:ID>VAT</cbc:ID>
+        <cbc:Percent>7.5</cbc:Percent>
+        <cac:TaxScheme>
+          <cbc:ID>VAT</cbc:ID>
+          <cbc:Name>Value Added Tax</cbc:Name>
+        </cac:TaxScheme>
+      </cac:TaxCategory>
+    </cac:TaxSubtotal>
+  </cac:TaxTotal>
+  
+  <!-- Monetary Total -->
+  <cac:LegalMonetaryTotal>
+    <cbc:LineExtensionAmount currencyID="NGN">3500000</cbc:LineExtensionAmount>
+    <cbc:AllowanceTotalAmount currencyID="NGN">175000</cbc:AllowanceTotalAmount>
+    <cbc:TaxExclusiveAmount currencyID="NGN">3325000</cbc:TaxExclusiveAmount>
+    <cbc:TaxInclusiveAmount currencyID="NGN">3574375</cbc:TaxInclusiveAmount>
+    <cbc:PayableAmount currencyID="NGN">3574375</cbc:PayableAmount>
+  </cac:LegalMonetaryTotal>
+  
+</Invoice>

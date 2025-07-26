@@ -1,0 +1,48 @@
+{
+  "invoiceNumber": "LEG-INV-001",
+  "issueDate": "2024-07-26",
+  "dueDate": "2024-08-25",
+  "supplier": {
+    "name": "Legacy Systems Corp",
+    "tin": "60606060-7070",
+    "email": "billing@legacysys.com",
+    "address": {
+      "street": "90 Old System Street",
+      "city": "Abuja",
+      "state": "FCT",
+      "country": "Nigeria"
+    }
+  },
+  "buyer": {
+    "name": "Modern Tech Solutions",
+    "tin": "80808080-9090",
+    "email": "accounts@moderntech.ng",
+    "address": {
+      "street": "15 Innovation Drive",
+      "city": "Lagos",
+      "state": "Lagos",
+      "country": "Nigeria"
+    }
+  },
+  "lineItems": [
+    {
+      "description": "Software migration services",
+      "quantity": 1,
+      "unitPrice": 500000,
+      "total": 500000
+    },
+    {
+      "description": "Database conversion",
+      "quantity": 1,
+      "unitPrice": 300000,
+      "total": 300000
+    }
+  ],
+  "subtotal": 800000,
+  "taxRate": 7.5,
+  "taxAmount": 60000,
+  "total": 860000,
+  "currency": "NGN",
+  "paymentTerms": "Net 30 days",
+  "notes": "Legacy format invoice for automatic conversion testing"
+}
