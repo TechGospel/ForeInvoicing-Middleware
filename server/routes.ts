@@ -226,6 +226,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tenantId = req.user?.tenantId || 1;
       const userId = req.user?.userId;
       
+      // Debug logging
+      console.log("Invoice submission request:");
+      console.log("- File:", req.file ? `${req.file.originalname} (${req.file.size} bytes)` : 'No file');
+      console.log("- Body keys:", Object.keys(req.body));
+      console.log("- Has invoiceData in body:", !!req.body.invoiceData);
+      console.log("- Tenant ID:", tenantId);
+      console.log("- User ID:", userId);
+      
       if (!tenantId) {
         return res.status(400).json({ message: "Tenant ID is required" });
       }
