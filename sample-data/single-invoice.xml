@@ -13,7 +13,7 @@
   <cbc:Note>Manufacturing goods supply invoice</cbc:Note>
   
   <!-- Business ID for FIRS -->
-  <cbc:BusinessID>manufacturing-business-001</cbc:BusinessID>
+  <cbc:BusinessID>550e8400-e29b-41d4-a716-446655440001</cbc:BusinessID>
   
   <!-- Supplier Party -->
   <cac:AccountingSupplierParty>

@@ -49,9 +49,10 @@ This directory contains sample invoice documents for testing the FIRS-compliant 
 
 **Expected Result**: 
 - ✅ Validation successful
-- ✅ Invoice stored with status "PENDING"
+- ✅ Invoice stored with status "VALIDATED" 
 - ✅ All FIRS mandatory fields validated
 - ✅ TIN format validated (12345678-9012)
+- ✅ Mock FIRS response received (development mode)
 
 ### 2. XML Upload Test
 
@@ -218,6 +219,15 @@ SELECT * FROM audit_logs WHERE action = 'submit'
 -- API usage tracking
 SELECT * FROM api_usage WHERE endpoint = '/api/invoices';
 ```
+
+## Recent Fixes (July 26, 2025)
+
+All sample data files have been updated to be fully FIRS-compliant:
+- ✅ Fixed business_id format (now using valid UUIDs)
+- ✅ Fixed sellers_item_identification structure (object → string)  
+- ✅ Fixed classified_tax_category structure (object → array)
+- ✅ Fixed payment_means_code type (string → number)
+- ✅ Added missing payment_due_date fields
 
 ## Troubleshooting Common Issues
 

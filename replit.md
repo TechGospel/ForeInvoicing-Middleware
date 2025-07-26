@@ -149,6 +149,7 @@ Changelog:
 - July 01, 2025. Added comprehensive local development setup with automated scripts
 - July 01, 2025. Implemented full FIRS UBL 3.0 compliance with official schema validation
 - July 26, 2025. Added comprehensive dotenv configuration with centralized environment management
+- July 26, 2025. Fixed FIRS validation issues and updated all sample data files to be fully compliant
 ```
 
 # User Preferences

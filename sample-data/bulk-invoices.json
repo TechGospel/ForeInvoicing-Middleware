@@ -2,7 +2,7 @@
   "batch_id": "BATCH-20240726-001",
   "invoices": [
     {
-      "business_id": "test-business-001",
+      "business_id": "550e8400-e29b-41d4-a716-446655440002",
       "irn": "INV20240726-B001",
       "issue_date": "2024-07-26",
       "due_date": "2024-08-25",
@@ -37,13 +37,15 @@
           "item": {
             "description": "Samsung Galaxy Smartphone",
             "name": "Galaxy A54 5G",
-            "sellers_item_identification": {
-              "id": "PHONE-SAM-A54"
-            },
-            "classified_tax_category": {
+            "sellers_item_identification": "PHONE-SAM-A54",
+            "classified_tax_category": [{
               "id": "VAT",
-              "percent": 7.5
-            }
+              "percent": 7.5,
+              "tax_scheme": {
+                "id": "VAT",
+                "name": "Value Added Tax"
+              }
+            }]
           },
           "price": {
             "price_amount": 150000
@@ -73,7 +75,7 @@
       }
     },
     {
-      "business_id": "test-business-002",
+      "business_id": "550e8400-e29b-41d4-a716-446655440003",
       "irn": "INV20240726-B002",
       "issue_date": "2024-07-26",
       "due_date": "2024-08-25",
@@ -113,10 +115,15 @@
           "item": {
             "description": "Management consulting services",
             "name": "Strategic Planning Consultation",
-            "classified_tax_category": {
+            "sellers_item_identification": "CONS-STRAT-001",
+            "classified_tax_category": [{
               "id": "VAT",
-              "percent": 7.5
-            }
+              "percent": 7.5,
+              "tax_scheme": {
+                "id": "VAT",
+                "name": "Value Added Tax"
+              }
+            }]
           },
           "price": {
             "price_amount": 20000
@@ -146,7 +153,7 @@
       }
     },
     {
-      "business_id": "test-business-003",
+      "business_id": "550e8400-e29b-41d4-a716-446655440004",
       "irn": "INV20240726-B003",
       "issue_date": "2024-07-26",
       "due_date": "2024-08-10",
@@ -181,13 +188,15 @@
           "item": {
             "description": "Designer dress - returned due to size issues",
             "name": "Evening Dress Collection",
-            "sellers_item_identification": {
-              "id": "DRESS-EVE-001"
-            },
-            "classified_tax_category": {
+            "sellers_item_identification": "DRESS-EVE-001",
+            "classified_tax_category": [{
               "id": "VAT",
-              "percent": 7.5
-            }
+              "percent": 7.5,
+              "tax_scheme": {
+                "id": "VAT",
+                "name": "Value Added Tax"
+              }
+            }]
           },
           "price": {
             "price_amount": 37500
