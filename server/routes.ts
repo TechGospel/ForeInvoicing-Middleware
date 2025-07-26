@@ -9,6 +9,7 @@ import { FirsInvoiceValidator } from "./services/firs-validator";
 import { FirsAdapter } from "./services/firs-adapter-v2";
 import { AuditLogger } from "./services/audit-logger";
 import { AuthService } from "./services/auth";
+import { config } from "./config";
 import multer from "multer";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -21,12 +22,13 @@ interface AuthRequest extends Request {
   };
 }
 
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ 
+  dest: config.uploadDir,
+  limits: { fileSize: config.maxFileSize }
+});
 const firsValidator = new FirsInvoiceValidator();
 const firsAdapter = new FirsAdapter();
 const auditLogger = new AuditLogger(storage);
-
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
 // @ts-nocheck
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -66,7 +68,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const token = jwt.sign(
         { userId: user.id, tenantId: user.tenantId, role: user.role },
-        JWT_SECRET,
+        config.jwtSecret,
         { expiresIn: "24h" }
       );
 
