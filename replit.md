@@ -126,6 +126,7 @@ The system uses a multi-tenant PostgreSQL database with the following core entit
 
 ## Development Tools
 - **Setup Script**: `./setup-local.sh` - Automated local environment setup
+- **Environment Management**: Dotenv configuration with comprehensive validation
 - **Environment Check**: `node check-env.js` - Validates configuration
 - **Hot Reload**: Both frontend and backend support hot reloading
 - **Default Admin**: Username: `admin`, Password: `admin123`
@@ -147,6 +148,7 @@ Changelog:
 - July 01, 2025. Implemented comprehensive Docker containerization with production-grade security
 - July 01, 2025. Added comprehensive local development setup with automated scripts
 - July 01, 2025. Implemented full FIRS UBL 3.0 compliance with official schema validation
+- July 26, 2025. Added comprehensive dotenv configuration with centralized environment management
 ```
 
 # User Preferences

@@ -1,4 +1,5 @@
 import { type FirsInvoice } from '@shared/firs-schema';
+import { config } from '../config';
 
 export interface FirsApiResponse {
   irn: string;
@@ -18,13 +19,15 @@ export interface FirsSubmissionData extends FirsInvoice {
 
 export class FirsAdapter {
   private baseUrl: string;
-  private apiKey: string;
-  private timeout: number = 30000; // 30 seconds
-  private maxRetries: number = 3;
+  private apiKey: string | null;
+  private timeout: number;
+  private maxRetries: number;
   
   constructor() {
-    this.baseUrl = process.env.FIRS_API_URL || "https://einvoice.firs.gov.ng/api/v1";
-    this.apiKey = process.env.FIRS_API_KEY || "mock-api-key";
+    this.baseUrl = config.firsApiUrl;
+    this.apiKey = config.firsApiKey;
+    this.timeout = config.firsTimeout;
+    this.maxRetries = config.firsRetryAttempts;
   }
   
   /**
@@ -73,6 +76,11 @@ export class FirsAdapter {
    * Make the actual API request to FIRS
    */
   private async makeRequest(invoiceData: FirsSubmissionData, attempt: number): Promise<FirsApiResponse> {
+    // Check if FIRS submission is enabled and API key is available
+    if (!config.enableFirsSubmission || !this.apiKey) {
+      return this.createMockResponse(invoiceData);
+    }
+    
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
     
@@ -190,6 +198,25 @@ export class FirsAdapter {
     }
   }
   
+  /**
+   * Create a mock response for development/testing environments
+   */
+  private createMockResponse(invoiceData: FirsSubmissionData): FirsApiResponse {
+    const mockIrn = invoiceData.irn || this.generateIRN();
+    
+    return {
+      irn: mockIrn,
+      qrCode: `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==`,
+      status: 'VALIDATED',
+      message: 'Invoice validated successfully (MOCK RESPONSE - FIRS submission disabled)',
+      validationReport: {
+        isValid: true,
+        errors: [],
+        warnings: ['This is a mock response for development. Set ENABLE_FIRS_SUBMISSION=true and provide FIRS_API_KEY for production.']
+      }
+    };
+  }
+
   /**
    * Check if an error is retryable
    */
