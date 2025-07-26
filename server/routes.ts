@@ -279,6 +279,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validationResult = await firsValidator.validateFirsCompliant(invoiceData, format);
       
       if (!validationResult.isValid) {
+        console.log("Validation failed with errors:", JSON.stringify({
+          errors: validationResult.errors,
+          warnings: validationResult.warnings,
+          fieldErrors: validationResult.validationDetails?.fieldErrors
+        }, null, 2));
+
         await auditLogger.log({
           tenantId,
           userId,
