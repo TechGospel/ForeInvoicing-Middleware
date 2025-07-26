@@ -1,5 +1,5 @@
 {
-  "business_id": "test-business-001",
+  "business_id": "550e8400-e29b-41d4-a716-446655440000",
   "irn": "INV20240726-001",
   "issue_date": "2024-07-26",
   "due_date": "2024-08-25",
@@ -45,8 +45,9 @@
   },
   "payment_means": [
     {
-      "payment_means_code": "30",
+      "payment_means_code": 30,
       "payment_id": "INV-001-PAYMENT",
+      "payment_due_date": "2024-08-25",
       "payee_financial_account": {
         "id": "0123456789",
         "name": "TechSolutions Nigeria Ltd",
@@ -67,17 +68,15 @@
       "item": {
         "description": "Enterprise Software License - 12 months subscription",
         "name": "Premium Software Suite",
-        "sellers_item_identification": {
-          "id": "SOFT-PREM-001"
-        },
-        "classified_tax_category": {
+        "sellers_item_identification": "SOFT-PREM-001",
+        "classified_tax_category": [{
           "id": "VAT",
           "percent": 7.5,
           "tax_scheme": {
             "id": "VAT",
             "name": "Value Added Tax"
           }
-        }
+        }]
       },
       "price": {
         "price_amount": 100000,
@@ -93,17 +92,15 @@
       "item": {
         "description": "24/7 Technical Support and System Maintenance",
         "name": "Technical Support Package",
-        "sellers_item_identification": {
-          "id": "SUPP-TECH-001"
-        },
-        "classified_tax_category": {
+        "sellers_item_identification": "SUPP-TECH-001",
+        "classified_tax_category": [{
           "id": "VAT",
           "percent": 7.5,
           "tax_scheme": {
             "id": "VAT",
             "name": "Value Added Tax"
           }
-        }
+        }]
       },
       "price": {
         "price_amount": 150000,

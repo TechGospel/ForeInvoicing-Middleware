@@ -226,13 +226,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tenantId = req.user?.tenantId || 1;
       const userId = req.user?.userId;
       
-      // Debug logging
-      console.log("Invoice submission request:");
-      console.log("- File:", req.file ? `${req.file.originalname} (${req.file.size} bytes)` : 'No file');
-      console.log("- Body keys:", Object.keys(req.body));
-      console.log("- Has invoiceData in body:", !!req.body.invoiceData);
-      console.log("- Tenant ID:", tenantId);
-      console.log("- User ID:", userId);
+      // Debug logging (can be removed in production)
+      console.log("Invoice submission:", req.file ? `${req.file.originalname} (${req.file.size} bytes)` : 'JSON data');
       
       if (!tenantId) {
         return res.status(400).json({ message: "Tenant ID is required" });
@@ -279,11 +274,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validationResult = await firsValidator.validateFirsCompliant(invoiceData, format);
       
       if (!validationResult.isValid) {
-        console.log("Validation failed with errors:", JSON.stringify({
-          errors: validationResult.errors,
-          warnings: validationResult.warnings,
-          fieldErrors: validationResult.validationDetails?.fieldErrors
-        }, null, 2));
+        console.log("Validation failed:", validationResult.errors.slice(0, 3).join(", ") + (validationResult.errors.length > 3 ? "..." : ""));
 
         await auditLogger.log({
           tenantId,
